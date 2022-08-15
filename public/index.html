@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/index.css" />
+    <title>X's and O's</title>
+  </head>
+  <body>
+    <h1>Welcome to X's and O's</h1>
+    <form>
+      <label for="">Create Message</label>
+      <input type="text" placeholder="Enter Text Here" id="textInput" />
+      <button id="sendButton">Press Here to Broadcast Message</button>
+    </form>
+    <div class="playBoard">
+      <canvas id="canvas" height="500" width="500"></canvas>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/index.js"></script>
+  </body>
+</html>
