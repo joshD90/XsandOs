@@ -2,19 +2,28 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+export const lineWidth = 4;
+
 //use loop to draw x and y grid lines
-function drawGrid(xGrid, yGrid) {
+function drawGrid(gridSquares, xGrid, yGrid) {
   //draw a verticle line from top to bottom of canvas at intervals set by gridX param
-  for (let i = 1; i < xGrid; i++) {
+  for (let i = 0; i < xGrid; i++) {
     ctx.beginPath();
+    const middlePoint = gridSquares.find((elem) => elem.coord.x === i);
     const gridWidth = canvas.width / xGrid;
-    ctx.fillRect(gridWidth * i, 0, 3, canvas.height);
+    console.log(gridWidth);
+    const startPointX = middlePoint.center.x + gridWidth / 2 - lineWidth / 2;
+
+    ctx.fillRect(startPointX, 0, lineWidth, canvas.height);
   }
   //do the same for the horizontal lines
-  for (let i = 1; i < yGrid; i++) {
+  for (let i = 0; i < yGrid; i++) {
     ctx.beginPath();
+    const middlePoint = gridSquares.find((elem) => elem.coord.y === i);
     const gridHeight = canvas.height / yGrid;
-    ctx.fillRect(0, gridHeight * i, canvas.width, 3);
+    const startPointY = middlePoint.center.y + gridHeight / 2 - lineWidth / 2;
+
+    ctx.fillRect(0, startPointY, canvas.width, lineWidth);
   }
 }
 
@@ -38,6 +47,7 @@ function setGridSquares(gridSquares, numXRows, numYRows) {
       gridSquares.push({ coord: coord, center: center });
     }
   }
+  drawGridCenter(gridSquares);
   return console.log(gridSquares);
 }
 //just a way of checking whether the gridCenter, center property is returning the correct value
@@ -56,14 +66,16 @@ function drawLine(pointA, pointB) {
 }
 
 function setUpGrid(gridSquares, xGrid, yGrid) {
-  drawGrid(xGrid, yGrid);
   //fill  the gridSquares properties for each square
   setGridSquares(gridSquares, xGrid, yGrid);
+  //now draw lines based on grid points
+  drawGrid(gridSquares, xGrid, yGrid);
+
   //draw a square at the center of each square
   drawGridCenter(gridSquares);
   //checking whether a diagonal line runs through the centers to make sure they aren't off center
   //drawLine(gridSquares[2].center, gridSquares[6].center);
-  drawLine({ x: 0, y: 0 }, { x: 500, y: 500 });
+  //drawLine({ x: 0, y: 0 }, { x: 500, y: 500 });
 }
 
 export { setUpGrid, drawLine, setGridSquares, drawGrid, drawGridCenter };

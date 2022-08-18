@@ -1,5 +1,6 @@
 import { setUpGrid } from "./modules/setUpGrid.js";
 import { getMousePosition, checkWhichSquare } from "./modules/mouseMove.js";
+import { createImage } from "./modules/xAndO.js";
 
 const socket = io();
 //set up our chat and socket constants
@@ -15,13 +16,16 @@ const gridSquares = [];
 let mousePos = {};
 
 //call our grid / squares set up
-setUpGrid(gridSquares, 3, 3);
+setUpGrid(gridSquares, 5, 5);
 
 //set up our listener to update mousePos
 getMousePosition(mousePos);
 
 //set up our event listeners to see whether the mouse is on the canvas
-checkWhichSquare(gridSquares, canvas.width / 6, canvas.height / 6, ctx);
+checkWhichSquare(gridSquares, canvas.width / 10, canvas.height / 10, ctx);
+
+//add an image
+createImage(ctx, 100, 100, 100, 100);
 
 //send a message to server
 const broadcastMessage = (e) => {

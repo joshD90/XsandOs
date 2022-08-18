@@ -23,6 +23,12 @@ export function checkWhichSquare(gridSquares, gsWidth, gsHeight, ctx) {
     if (!mouseOnCanvas) return console.log("not on canvas");
 
     gridSquares.forEach((elem) => {
+      ctx.beginPath();
+      ctx.fillStyle = "red";
+      ctx.fillRect(0, 0, 5, gsHeight);
+
+      const lineWidth = 4;
+
       if (
         mousePos.x > elem.center.x - gsWidth &&
         mousePos.x < elem.center.x + gsWidth
@@ -34,20 +40,29 @@ export function checkWhichSquare(gridSquares, gsWidth, gsHeight, ctx) {
           ctx.beginPath();
           ctx.fillStyle = "lightblue";
           ctx.fillRect(
-            elem.center.x - gsWidth,
-            elem.center.y - gsHeight,
-            gsWidth * 2,
-            gsHeight * 2
+            elem.center.x - (gsWidth - lineWidth / 2),
+            elem.center.y - (gsHeight - lineWidth / 2),
+            gsWidth * 2 - lineWidth,
+            gsHeight * 2 - lineWidth
+          );
+        } else {
+          ctx.beginPath();
+          ctx.fillStyle = "blue";
+          ctx.fillRect(
+            elem.center.x - (gsWidth - lineWidth / 2),
+            elem.center.y - (gsHeight - lineWidth / 2),
+            gsWidth * 2 - lineWidth,
+            gsHeight * 2 - lineWidth
           );
         }
       } else {
         ctx.beginPath();
         ctx.fillStyle = "blue";
         ctx.fillRect(
-          elem.center.x - gsWidth - 1,
-          elem.center.y - gsHeight - 1,
-          (gsWidth - 1) * 2,
-          (gsHeight - 1) * 2
+          elem.center.x - (gsWidth - lineWidth / 2),
+          elem.center.y - (gsHeight - lineWidth / 2),
+          gsWidth * 2 - lineWidth,
+          gsHeight * 2 - lineWidth
         );
       }
     });
