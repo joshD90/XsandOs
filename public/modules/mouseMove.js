@@ -1,5 +1,5 @@
 const canvas = document.getElementById("canvas");
-let mouseOnCanvas = false;
+export let mouseOnCanvas = false;
 let mousePos = {};
 
 canvas.addEventListener("mouseenter", () => {
@@ -18,24 +18,39 @@ export function getMousePosition() {
   });
 }
 
-export function checkWhichSquare(gridSquares, gsWidth, gsHeight, ctx) {
-  document.addEventListener("mousemove", () => {
-    if (!mouseOnCanvas) return console.log("not on canvas");
+export function checkWhichSquare(
+  gridSquares,
+  gsWidth,
+  gsHeight,
+  ctx,
+  currentSquare,
+  playerSquares,
+  otherPlayerSquares
+) {
+  if (!mouseOnCanvas) return console.log("not on canvas");
+  const lineWidth = 4;
 
-    gridSquares.forEach((elem) => {
-      ctx.beginPath();
-      ctx.fillStyle = "red";
-      ctx.fillRect(0, 0, 5, gsHeight);
-
-      const lineWidth = 4;
-
+  gridSquares.forEach((elem) => {
+    if (
+      mousePos.x > elem.center.x - gsWidth &&
+      mousePos.x < elem.center.x + gsWidth
+    ) {
       if (
-        mousePos.x > elem.center.x - gsWidth &&
-        mousePos.x < elem.center.x + gsWidth
+        mousePos.y > elem.center.y - gsHeight &&
+        mousePos.y < elem.center.y + gsHeight
       ) {
+        currentSquare.current = elem;
         if (
-          mousePos.y > elem.center.y - gsHeight &&
-          mousePos.y < elem.center.y + gsHeight
+          !playerSquares.some(
+            (playElem) =>
+              playElem.coord.x === elem.coord.x &&
+              playElem.coord.y === elem.coord.y
+          ) &&
+          !otherPlayerSquares.some(
+            (otherElem) =>
+              otherElem.coord.x === elem.coord.x &&
+              otherElem.coord.y === elem.coord.y
+          )
         ) {
           ctx.beginPath();
           ctx.fillStyle = "lightblue";
@@ -45,7 +60,15 @@ export function checkWhichSquare(gridSquares, gsWidth, gsHeight, ctx) {
             gsWidth * 2 - lineWidth,
             gsHeight * 2 - lineWidth
           );
-        } else {
+        }
+      } else {
+        if (
+          !playerSquares.some(
+            (playElem) =>
+              playElem.coord.x === elem.coord.x &&
+              playElem.coord.y === elem.coord.y
+          )
+        ) {
           ctx.beginPath();
           ctx.fillStyle = "blue";
           ctx.fillRect(
@@ -55,7 +78,15 @@ export function checkWhichSquare(gridSquares, gsWidth, gsHeight, ctx) {
             gsHeight * 2 - lineWidth
           );
         }
-      } else {
+      }
+    } else {
+      if (
+        !playerSquares.some(
+          (playElem) =>
+            playElem.coord.x === elem.coord.x &&
+            playElem.coord.y === elem.coord.y
+        )
+      ) {
         ctx.beginPath();
         ctx.fillStyle = "blue";
         ctx.fillRect(
@@ -65,6 +96,6 @@ export function checkWhichSquare(gridSquares, gsWidth, gsHeight, ctx) {
           gsHeight * 2 - lineWidth
         );
       }
-    });
+    }
   });
 }

@@ -26,9 +26,13 @@ io.on("connection", (socket) => {
   socket.on("chat message", (message) => {
     //when we get this we emit to all others connected
     socket.broadcast.emit("chat message", message);
-    console.log(message, "this has come from chat message");
+  });
+  //set up listener for change in player selection
+  socket.on("selectionInfo", (info) => {
+    socket.broadcast.emit("selectionInfo", info);
   });
 });
+
 //get server to listen on port 3000
 server.listen(3000, () => {
   console.log("listening on port 3000");
