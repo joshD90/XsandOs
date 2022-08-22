@@ -9,13 +9,22 @@
   </head>
   <body>
     <h1>Welcome to X's and O's</h1>
-    <form>
-      <label for="">Create Message</label>
-      <input type="text" placeholder="Enter Text Here" id="textInput" />
-      <button id="sendButton">Press Here to Broadcast Message</button>
-    </form>
+
     <div class="playBoard">
       <canvas id="canvas" height="500" width="500"></canvas>
+    </div>
+    <div class="enterInfo">
+      <div class="enterInfoHeaderDiv">
+        <h3>Welcome to X's and O's</h3>
+        <h4>Please Enter UserName Here</h4>
+      </div>
+
+      <div class="usernameInputDiv">
+        <form>
+          <input type="text" id="usernameInput" />
+          <input type="button" id="usernameButton" value="Start Game" />
+        </form>
+      </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>

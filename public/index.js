@@ -1,9 +1,5 @@
 import { setUpGrid } from "./modules/setUpGrid.js";
-import {
-  getMousePosition,
-  checkWhichSquare,
-  mouseOnCanvas,
-} from "./modules/mouseMove.js";
+import { getMousePosition, checkWhichSquare } from "./modules/mouseMove.js";
 import {
   createImage,
   playerSelect,
@@ -13,9 +9,7 @@ import {
 import { checkWin } from "./modules/checkWin.js";
 
 const socket = io();
-//set up our chat and socket constants
-const sendButton = document.getElementById("sendButton");
-const textInput = document.getElementById("textInput");
+
 //set up our canvas consts
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -31,8 +25,10 @@ let otherPlayerChoices = [];
 //call our grid / squares set up
 setUpGrid(gridSquares, 5, 5);
 
-//get our mousePosition - this will feed back the mouse position to the modules local variable
+//get our mousePosition - this sets up a listener which will feed back the mouse
+//position to the modules local variable
 getMousePosition();
+
 canvas.addEventListener("mousemove", handleMouseActions);
 
 function handleMouseActions() {
@@ -67,23 +63,8 @@ const sendChoiceInfo = () => {
   socket.emit("selectionInfo", playerChoices);
 };
 
+//sets up a listener to check for any new input from other user
 socket.on("selectionInfo", (choiceArray) => {
   otherPlayerChoices = choiceArray;
   createOImage(ctx, otherPlayerChoices, 96, 96);
-});
-
-//send a message to server
-const broadcastMessage = (e) => {
-  e.preventDefault();
-  //check to see has anything been written in input before sending off
-  if (textInput.value) {
-    socket.emit("chat message", textInput.value);
-    textInput.value = "";
-  }
-};
-//add listener to detect the click
-document.addEventListener("click", broadcastMessage);
-//set up a listener to check whether any information has been gotten from server
-socket.on("chat message", (message) => {
-  console.log(message, "this is has come from the server");
 });

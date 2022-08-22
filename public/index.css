@@ -2,6 +2,10 @@ body {
   box-sizing: border-box;
 }
 
+h1 {
+  text-align: center;
+}
+
 .playBoard {
   width: 100%;
   text-align: center;
@@ -13,4 +17,73 @@ body {
   margin-left: auto;
   margin-right: auto;
   border: 5px solid black;
+}
+
+.enterInfo {
+  background-image: url(/assets/inputBackground.jpg);
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  transform: translate(-50%, -50%);
+  background-color: black;
+  height: 100vh;
+  width: 100vw;
+  text-align: center;
+  background-size: cover;
+}
+
+.enterInfoHeaderDiv {
+  background-color: rgba(0, 0, 0, 0.6);
+  width: 50vw;
+  margin: 10vh auto;
+  border-radius: 20px;
+  box-shadow: 0 0 20px 20px rgba(0, 0, 0, 0.6);
+}
+
+.enterInfo h3 {
+  color: white;
+  font-size: 3rem;
+}
+
+.enterInfo h4 {
+  color: white;
+  font-size: 2rem;
+}
+
+.usernameInputDiv {
+  height: 100px;
+  background-color: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 20px 20px rgba(0, 0, 0, 0.6);
+  border-radius: 20px;
+  margin: 0 auto;
+  width: 50vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  font-size: 0;
+}
+
+#usernameInput {
+  height: 40px;
+  width: 360px;
+  border-style: none;
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
+  outline-width: 0;
+  padding: 0;
+  font-size: 1rem;
+}
+#usernameButton {
+  height: 40px;
+  border-style: none;
+  background-color: #999;
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  width: 120px;
+  margin: 0;
+  padding: 0;
+  border-width: 0;
 }
