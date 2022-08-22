@@ -10,7 +10,7 @@ import {
   createOImage,
   checkIsClicked,
 } from "./modules/xAndO.js";
-import { checkWin, sussWin, dummyFunc } from "./modules/checkWin.js";
+import { checkWin } from "./modules/checkWin.js";
 
 const socket = io();
 //set up our chat and socket constants
@@ -58,7 +58,7 @@ canvas.addEventListener("click", () => {
     return;
   playerSelect(currentSquare, playerChoices, ctx);
   createImage(ctx, playerChoices, 100, 100);
-  dummyFunc(playerChoices);
+  checkWin(playerChoices);
   sendChoiceInfo();
 });
 
