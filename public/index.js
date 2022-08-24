@@ -8,7 +8,15 @@ import {
 } from "./modules/xAndO.js";
 import { checkWin } from "./modules/checkWin.js";
 
+//set up our socket
 const socket = io();
+
+//set up our starting button + name
+const startButton = document.getElementById("usernameButton");
+const nameInput = document.getElementById("usernameInput");
+const startDiv = document.querySelector(".enterInfo");
+
+startButton.addEventListener("click", doStart);
 
 //set up our canvas consts
 const canvas = document.getElementById("canvas");
@@ -21,6 +29,13 @@ let currentSquare = { current: {} };
 const playerChoices = [];
 //set up the other players choice array
 let otherPlayerChoices = [];
+
+function doStart(e) {
+  e.preventDefault();
+  console.log(nameInput.value);
+  socket.emit("send-username", nameInput.value);
+  startDiv.classList.add("hidden");
+}
 
 //call our grid / squares set up
 setUpGrid(gridSquares, 5, 5);
