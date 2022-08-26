@@ -21,6 +21,7 @@ app.get("/", (req, res) => {
 
 //set up listener for connection
 io.on("connection", (socket) => {
+  //this will help trace any memory leaks associated with assigning our listeners
   process.on("warning", (e) => {
     console.log(e.stack);
   });
@@ -28,6 +29,8 @@ io.on("connection", (socket) => {
   //set up users
   let users = [];
   //run through a loop of sockets and push them into users
+  //unfortunately this will only create a local user array unique to each
+  //socket and only socket id information from other users will be passed over
   for (let [id, socket] of io.of("/").sockets) {
     users.push({
       userID: id,
@@ -40,8 +43,8 @@ io.on("connection", (socket) => {
   //we will push the 'real' rooms onto this array so we can access and use them
   //at a later point
   let newRoomList = [];
+  //we assign all users as they connect 2 to a room
   assignRooms(socket, rooms, newRoomList, users);
-  checkWhichRoom(socket, rooms);
 
   //set up listener for disconnection
   socket.on("disconnect", () => {
@@ -55,12 +58,26 @@ io.on("connection", (socket) => {
   // //set up listener for player sending over their username
   socket.on("send-username", (playername) => {
     //find the index of the user in the user array
+    //unfortunately this only updates a local user array and is not passed to
+    //other users. We will use this to determine which room we will be emitting
+    //to
     const userToChange = users.find((user) => user.userID === socket.id);
     const indexOfUser = users.indexOf(userToChange);
     users[indexOfUser].username = playername;
-
+    const myRoom = users[indexOfUser].roomName;
     //see what room and username have been assigned
     console.log(users, "USERS ON SEND MESSAGE");
+    //emit the chosen nickname to the other player
+    socket.to(myRoom).emit("receive-name", playername);
+  });
+
+  //set up listener for the winner
+  socket.on("player-wins", (message) => {
+    console.log("This is unbelievable we have a WINNER");
+    const userToChange = users.find((user) => user.userID === socket.id);
+    const indexOfUser = users.indexOf(userToChange);
+    const myRoom = users[indexOfUser].roomName;
+    socket.to(myRoom).emit("other-player-wins", message);
   });
   //set up listener for events named chat message
   socket.on("chat message", (message) => {
@@ -74,6 +91,6 @@ io.on("connection", (socket) => {
 });
 
 //get server to listen on port 3000
-server.listen(3002, () => {
-  console.log("listening on port 3001");
+server.listen(3000, () => {
+  console.log("listening on port 3000");
 });

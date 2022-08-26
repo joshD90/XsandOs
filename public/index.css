@@ -5,6 +5,14 @@ body {
 h1 {
   text-align: center;
 }
+.bannerDiv {
+  text-align: center;
+  border: 1px solid black;
+  min-height: 120px;
+  width: 70%;
+  margin: auto auto;
+  margin-bottom: 10px;
+}
 
 .playBoard {
   width: 100%;

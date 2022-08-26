@@ -1,6 +1,6 @@
 let count = 0;
 
-export function checkWin(playerChoices) {
+export function checkWin(playerChoices, isWinner) {
   //set up our array of directions that we need to cycle through
   const directions = [
     "left",
@@ -21,14 +21,24 @@ export function checkWin(playerChoices) {
       count = 0;
       //this function checks an adjacent square in the passed direction and continues off in
       //that direction until it returns false or the count increases
-      checkNext(elem, directionElem, playerChoices, 100);
+      checkNext(elem, directionElem, playerChoices, 100, isWinner);
     });
   });
 }
 
-function checkNext(startPoint, direction, playerChoice, squareParams) {
+function checkNext(
+  startPoint,
+  direction,
+  playerChoice,
+  squareParams,
+  isWinner
+) {
   //we check if the count has reach 3 and exit the recursive loop if it has
-  if (count === 3) return alert("WE HAVE A WINNER");
+  if (count === 3) {
+    alert("WE HAVE A WINNER");
+    return (isWinner.playerWin = true);
+  }
+
   //we set up the next point.  We must add in the {center:} as the part of the object
   //so that it can be easily inserted back into the format of the function
   let nextPoint = { center: {} };
@@ -40,7 +50,13 @@ function checkNext(startPoint, direction, playerChoice, squareParams) {
         x: startPoint.center.x,
         y: startPoint.center.y - squareParams,
       };
-      checkIsInArray(playerChoice, nextPoint, direction, squareParams);
+      checkIsInArray(
+        playerChoice,
+        nextPoint,
+        direction,
+        squareParams,
+        isWinner
+      );
       break;
     //add y and no x
     case "down":
@@ -48,7 +64,13 @@ function checkNext(startPoint, direction, playerChoice, squareParams) {
         x: startPoint.center.x,
         y: startPoint.center.y + squareParams,
       };
-      checkIsInArray(playerChoice, nextPoint, direction, squareParams);
+      checkIsInArray(
+        playerChoice,
+        nextPoint,
+        direction,
+        squareParams,
+        isWinner
+      );
       break;
     //add x and no y
 
@@ -57,7 +79,13 @@ function checkNext(startPoint, direction, playerChoice, squareParams) {
         x: startPoint.center.x + squareParams,
         y: startPoint.center.y,
       };
-      checkIsInArray(playerChoice, nextPoint, direction, squareParams);
+      checkIsInArray(
+        playerChoice,
+        nextPoint,
+        direction,
+        squareParams,
+        isWinner
+      );
       break;
     //subtract x and no y
     case "left":
@@ -65,7 +93,13 @@ function checkNext(startPoint, direction, playerChoice, squareParams) {
         x: startPoint.center.x - squareParams,
         y: startPoint.center.y,
       };
-      checkIsInArray(playerChoice, nextPoint, direction, squareParams);
+      checkIsInArray(
+        playerChoice,
+        nextPoint,
+        direction,
+        squareParams,
+        isWinner
+      );
       break;
     //subtract x and y to get to the next point diagonally up to the left
     case "leftUpDiag":
@@ -73,7 +107,13 @@ function checkNext(startPoint, direction, playerChoice, squareParams) {
         x: startPoint.center.x - squareParams,
         y: startPoint.center.y - squareParams,
       };
-      checkIsInArray(playerChoice, nextPoint, direction, squareParams);
+      checkIsInArray(
+        playerChoice,
+        nextPoint,
+        direction,
+        squareParams,
+        isWinner
+      );
       break;
     //subtract x and no y
     case "leftDownDiag":
@@ -81,7 +121,13 @@ function checkNext(startPoint, direction, playerChoice, squareParams) {
         x: startPoint.center.x - squareParams,
         y: startPoint.center.y + squareParams,
       };
-      checkIsInArray(playerChoice, nextPoint, direction, squareParams);
+      checkIsInArray(
+        playerChoice,
+        nextPoint,
+        direction,
+        squareParams,
+        isWinner
+      );
       break;
     //add x and subtract y
     case "rightUpDiag":
@@ -89,7 +135,13 @@ function checkNext(startPoint, direction, playerChoice, squareParams) {
         x: startPoint.center.x + squareParams,
         y: startPoint.center.y - squareParams,
       };
-      checkIsInArray(playerChoice, nextPoint, direction, squareParams);
+      checkIsInArray(
+        playerChoice,
+        nextPoint,
+        direction,
+        squareParams,
+        isWinner
+      );
       break;
     //add x and add y
     case "rightDownDiag":
@@ -97,7 +149,13 @@ function checkNext(startPoint, direction, playerChoice, squareParams) {
         x: startPoint.center.x + squareParams,
         y: startPoint.center.y + squareParams,
       };
-      checkIsInArray(playerChoice, nextPoint, direction, squareParams);
+      checkIsInArray(
+        playerChoice,
+        nextPoint,
+        direction,
+        squareParams,
+        isWinner
+      );
       break;
 
     default:
@@ -105,7 +163,13 @@ function checkNext(startPoint, direction, playerChoice, squareParams) {
   }
 }
 
-function checkIsInArray(playerChoice, nextPoint, direction, squareParams) {
+function checkIsInArray(
+  playerChoice,
+  nextPoint,
+  direction,
+  squareParams,
+  isWinner
+) {
   //if that adjacent square happens to be part of the player choice array we can re-call
   //the checkNext function which we continue to pass the direction to.
   if (
@@ -120,6 +184,6 @@ function checkIsInArray(playerChoice, nextPoint, direction, squareParams) {
     count++;
 
     //call check next function recursively
-    checkNext(nextPoint, direction, playerChoice, squareParams);
+    checkNext(nextPoint, direction, playerChoice, squareParams, isWinner);
   } else count = 0;
 }

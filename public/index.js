@@ -15,7 +15,8 @@ const socket = io();
 const startButton = document.getElementById("usernameButton");
 const nameInput = document.getElementById("usernameInput");
 const startDiv = document.querySelector(".enterInfo");
-
+const turnBanner = document.querySelector(".turnBanner");
+//
 startButton.addEventListener("click", doStart);
 
 //set up our canvas consts
@@ -29,16 +30,42 @@ let currentSquare = { current: {} };
 const playerChoices = [];
 //set up the other players choice array
 let otherPlayerChoices = [];
+//set up other player name
+let myName;
+let otherPlayerName;
+let isMyTurn;
+let isWinner = { playerWin: false };
 
 function doStart(e) {
   e.preventDefault();
   console.log(nameInput.value);
-  socket.emit("send-username", nameInput.value);
+  myName = nameInput.value;
+  if (otherPlayerName) {
+    socket.emit("send-username", { name: myName, requestInfo: false });
+  } else socket.emit("send-username", { name: myName, requestInfo: true });
   startDiv.classList.add("hidden");
 }
 
 //call our grid / squares set up
 setUpGrid(gridSquares, 5, 5);
+
+//now we check whether the other user has connected
+socket.on("receive-name", (otherPlayerInfo) => {
+  console.log("Other Player Name is ", otherPlayerInfo);
+  if (otherPlayerInfo.yourTurn) {
+    isMyTurn = true;
+    turnBanner.innerText = "IT'S YOUR TURN";
+    turnBanner.classList.remove("hidden");
+  }
+  if (otherPlayerInfo.requestInfo && myName)
+    socket.emit("send-username", {
+      name: myName,
+      requestInfo: false,
+      yourTurn: true,
+    });
+  const playerBanner = document.querySelector(".playerConnectionBanner");
+  playerBanner.innerText = `You have connected with ${otherPlayerInfo.name}`;
+});
 
 //get our mousePosition - this sets up a listener which will feed back the mouse
 //position to the modules local variable
@@ -65,21 +92,39 @@ function handleMouseActions() {
 
 //add an event listener which will add selection of square to the player choice array
 canvas.addEventListener("click", () => {
+  if (!isMyTurn) return;
   if (checkIsClicked(currentSquare, playerChoices, otherPlayerChoices) === true)
     return;
   playerSelect(currentSquare, playerChoices, ctx);
   createImage(ctx, playerChoices, 100, 100);
-  checkWin(playerChoices);
+  checkWin(playerChoices, isWinner);
   sendChoiceInfo();
 });
 
 //function to send player Info to other player
 const sendChoiceInfo = () => {
   socket.emit("selectionInfo", playerChoices);
+  isMyTurn = false;
+  turnBanner.classList.add("hidden");
+  console.log(isWinner.playerWin);
+  if (isWinner.playerWin) {
+    socket.emit("player-wins", myName);
+    turnBanner.innerText = "YOU ARE THE WINNER";
+    turnBanner.classList.remove("hidden");
+  }
 };
 
 //sets up a listener to check for any new input from other user
 socket.on("selectionInfo", (choiceArray) => {
   otherPlayerChoices = choiceArray;
   createOImage(ctx, otherPlayerChoices, 96, 96);
+  isMyTurn = true;
+  turnBanner.classList.remove("hidden");
+});
+
+socket.on("other-player-wins", (playerWinner) => {
+  isMyTurn = false;
+  turnBanner.innerText = `${playerWinner} is the winner!`;
+  turnBanner.classList.remove("hidden");
+  alert(`${playerWinner} has won`);
 });
