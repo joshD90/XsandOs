@@ -1,4 +1,4 @@
-import { setUpGrid } from "./modules/setUpGrid.js";
+import { drawLine, setUpGrid } from "./modules/setUpGrid.js";
 import { getMousePosition, checkWhichSquare } from "./modules/mouseMove.js";
 import {
   createImage,
@@ -7,6 +7,7 @@ import {
   checkIsClicked,
 } from "./modules/xAndO.js";
 import { checkWin } from "./modules/checkWin.js";
+import { doWin } from "./modules/winLine.js";
 
 //set up our socket
 const socket = io();
@@ -16,7 +17,7 @@ const startButton = document.getElementById("usernameButton");
 const nameInput = document.getElementById("usernameInput");
 const startDiv = document.querySelector(".enterInfo");
 const turnBanner = document.querySelector(".turnBanner");
-//
+//this is the button to enter the name
 startButton.addEventListener("click", doStart);
 
 //set up our canvas consts
@@ -34,7 +35,7 @@ let otherPlayerChoices = [];
 let myName;
 let otherPlayerName;
 let isMyTurn;
-let isWinner = { playerWin: false };
+let isWinner = { playerWin: false, winningArray: [] };
 
 function doStart(e) {
   e.preventDefault();
@@ -74,6 +75,8 @@ getMousePosition();
 canvas.addEventListener("mousemove", handleMouseActions);
 
 function handleMouseActions() {
+  //check to see if there is a winner and stop drawing if so
+  if (isWinner.playerWin) return;
   //set up our event listeners to see whether the mouse is on the canvas
   checkWhichSquare(
     gridSquares,
@@ -86,6 +89,7 @@ function handleMouseActions() {
   );
   //add all x's
   createImage(ctx, playerChoices, 100, 100);
+
   //add other players o's
   createOImage(ctx, otherPlayerChoices, 96, 96);
 }
@@ -106,11 +110,21 @@ const sendChoiceInfo = () => {
   socket.emit("selectionInfo", playerChoices);
   isMyTurn = false;
   turnBanner.classList.add("hidden");
-  console.log(isWinner.playerWin);
+
   if (isWinner.playerWin) {
-    socket.emit("player-wins", myName);
-    turnBanner.innerText = "YOU ARE THE WINNER";
-    turnBanner.classList.remove("hidden");
+    //we emit the event in the case of a win
+    socket.emit("player-wins", {
+      playerName: myName,
+      winningArray: isWinner.winningArray,
+    });
+    doWin(
+      isWinner.winningArray,
+      myName,
+      isMyTurn,
+      canvas,
+      myName,
+      handleMouseActions
+    );
   }
 };
 
@@ -122,9 +136,14 @@ socket.on("selectionInfo", (choiceArray) => {
   turnBanner.classList.remove("hidden");
 });
 
-socket.on("other-player-wins", (playerWinner) => {
-  isMyTurn = false;
-  turnBanner.innerText = `${playerWinner} is the winner!`;
-  turnBanner.classList.remove("hidden");
-  alert(`${playerWinner} has won`);
+//when we receive the winning notification from the server
+socket.on("other-player-wins", (winningInfo) => {
+  doWin(
+    winningInfo.winningArray,
+    winningInfo.playerName,
+    isMyTurn,
+    canvas,
+    myName,
+    handleMouseActions
+  );
 });

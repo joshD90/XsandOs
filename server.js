@@ -72,13 +72,15 @@ io.on("connection", (socket) => {
   });
 
   //set up listener for the winner
-  socket.on("player-wins", (message) => {
+  socket.on("player-wins", (winningInfo) => {
     console.log("This is unbelievable we have a WINNER");
     const userToChange = users.find((user) => user.userID === socket.id);
     const indexOfUser = users.indexOf(userToChange);
     const myRoom = users[indexOfUser].roomName;
-    socket.to(myRoom).emit("other-player-wins", message);
+    //broadcast the winning playername and the winning array associated
+    socket.to(myRoom).emit("other-player-wins", winningInfo);
   });
+
   //set up listener for events named chat message
   socket.on("chat message", (message) => {
     //when we get this we emit to all others connected

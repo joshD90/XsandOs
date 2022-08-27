@@ -1,4 +1,5 @@
 let count = 0;
+let winningArray = [];
 
 export function checkWin(playerChoices, isWinner) {
   //set up our array of directions that we need to cycle through
@@ -15,10 +16,12 @@ export function checkWin(playerChoices, isWinner) {
   //we cycle through each point on the players choice array
 
   playerChoices.forEach((elem) => {
+    if (isWinner.playerWin) return;
     //and go off in every direction from each of those start points
     directions.forEach((directionElem) => {
       //reset the count to zero so that it only goes in straight lines
       count = 0;
+      winningArray = [{ center: elem.center }];
       //this function checks an adjacent square in the passed direction and continues off in
       //that direction until it returns false or the count increases
       checkNext(elem, directionElem, playerChoices, 100, isWinner);
@@ -34,9 +37,12 @@ function checkNext(
   isWinner
 ) {
   //we check if the count has reach 3 and exit the recursive loop if it has
-  if (count === 3) {
+  if (count === 2) {
     alert("WE HAVE A WINNER");
-    return (isWinner.playerWin = true);
+    isWinner.playerWin = true;
+    isWinner.winningArray = winningArray;
+    console.log(isWinner);
+    return;
   }
 
   //we set up the next point.  We must add in the {center:} as the part of the object
@@ -159,7 +165,9 @@ function checkNext(
       break;
 
     default:
-      return (count = 0);
+      count = 0;
+      winningArray = [];
+      return;
   }
 }
 
@@ -182,8 +190,12 @@ function checkIsInArray(
     //if part of the array we add to count
 
     count++;
+    winningArray.push(nextPoint);
 
     //call check next function recursively
     checkNext(nextPoint, direction, playerChoice, squareParams, isWinner);
-  } else count = 0;
+  } else {
+    count = 0;
+    winningArray = [];
+  }
 }

@@ -60,6 +60,7 @@ function drawGridCenter(gridSquares) {
 //this function draws a line between any two points.
 function drawLine(pointA, pointB) {
   ctx.lineWidth = 4;
+  ctx.strokeStyle = "red";
   ctx.moveTo(pointA.x, pointA.y);
   ctx.lineTo(pointB.x, pointB.y);
   ctx.stroke();
