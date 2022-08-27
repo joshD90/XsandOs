@@ -1,5 +1,6 @@
 body {
   box-sizing: border-box;
+  background-image: radial-gradient(white, black);
 }
 
 h1 {
@@ -20,11 +21,13 @@ h1 {
 }
 
 #canvas {
-  background-color: blue;
+  background-color: #346b31;
   width: 500px;
   margin-left: auto;
   margin-right: auto;
-  border: 5px solid black;
+  border-width: 20px;
+  border-style: solid;
+  border-image: url(/assets/borderImage.jpg) stretch 100;
 }
 
 .enterInfo {

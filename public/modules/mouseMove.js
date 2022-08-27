@@ -53,7 +53,7 @@ export function checkWhichSquare(
           )
         ) {
           ctx.beginPath();
-          ctx.fillStyle = "lightblue";
+          ctx.fillStyle = "#87e082";
           ctx.fillRect(
             elem.center.x - (gsWidth - lineWidth / 2),
             elem.center.y - (gsHeight - lineWidth / 2),
@@ -70,7 +70,7 @@ export function checkWhichSquare(
           )
         ) {
           ctx.beginPath();
-          ctx.fillStyle = "blue";
+          ctx.fillStyle = "#346b31";
           ctx.fillRect(
             elem.center.x - (gsWidth - lineWidth / 2),
             elem.center.y - (gsHeight - lineWidth / 2),
@@ -88,7 +88,7 @@ export function checkWhichSquare(
         )
       ) {
         ctx.beginPath();
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = "#346b31";
         ctx.fillRect(
           elem.center.x - (gsWidth - lineWidth / 2),
           elem.center.y - (gsHeight - lineWidth / 2),

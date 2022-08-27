@@ -68,7 +68,7 @@ export function playerSelect(currentSquare, playerChoice, ctx) {
   )
     return;
   ctx.beginPath();
-  ctx.fillStyle = "blue";
+  ctx.fillStyle = "#346b31";
   ctx.fillRect(
     currentSquare.current.center.x - 48,
     currentSquare.current.center.y - 48,

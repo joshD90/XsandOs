@@ -97,6 +97,6 @@ export function doWin(
   //we set our timeout to allow the other listener to cease its activites fully by the time
   //we run this so that the x's and o's dont overwrite our line
   setTimeout(() => {
-    drawLine(beginPoint, endPoint);
+    drawLine(beginPoint, endPoint, "white");
   }, 200);
 }

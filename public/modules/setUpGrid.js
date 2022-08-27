@@ -58,9 +58,9 @@ function drawGridCenter(gridSquares) {
   });
 }
 //this function draws a line between any two points.
-function drawLine(pointA, pointB) {
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = "red";
+function drawLine(pointA, pointB, color) {
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = color;
   ctx.moveTo(pointA.x, pointA.y);
   ctx.lineTo(pointB.x, pointB.y);
   ctx.stroke();
