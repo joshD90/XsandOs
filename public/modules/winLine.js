@@ -88,7 +88,11 @@ export function doWin(
   let endPoint = { x: null, y: null };
   //create a beginning point and an end point for the line to be drawn
   beginPoint = getNewPoints(winningArray, 0, 1);
-  endPoint = getNewPoints(winningArray, 2, 1);
+  endPoint = getNewPoints(
+    winningArray,
+    winningArray.length - 1,
+    winningArray.length - 2
+  );
 
   //make sure that our canvas stops drawing the x's r o's to let our line go on top
   canvas.removeEventListener("mousemove", handleMouseActions);

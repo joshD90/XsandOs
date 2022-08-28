@@ -31,9 +31,15 @@ let currentSquare = { current: {} };
 const playerChoices = [];
 //set up the other players choice array
 let otherPlayerChoices = [];
+//board variables
+const numXRows = 5;
+const numYRows = 5;
+let boardColor = "#31572f"; //"#346b31";
+const boardHighlight = "#87e082";
 //set up other player name
 let myName;
 let otherPlayerName;
+//player turn and win conditions
 let isMyTurn;
 let isWinner = { playerWin: false, winningArray: [] };
 
@@ -42,17 +48,21 @@ function doStart(e) {
   console.log(nameInput.value);
   myName = nameInput.value;
   if (otherPlayerName) {
-    socket.emit("send-username", { name: myName, requestInfo: false });
+    socket.emit("send-username", {
+      name: myName,
+      requestInfo: false,
+      yourTurn: true,
+    });
   } else socket.emit("send-username", { name: myName, requestInfo: true });
   startDiv.classList.add("hidden");
 }
 
 //call our grid / squares set up
-setUpGrid(gridSquares, 5, 5);
+setUpGrid(gridSquares, numXRows, numYRows);
 
 //now we check whether the other user has connected
 socket.on("receive-name", (otherPlayerInfo) => {
-  console.log("Other Player Name is ", otherPlayerInfo);
+  otherPlayerName = otherPlayerInfo.name;
   if (otherPlayerInfo.yourTurn) {
     isMyTurn = true;
     turnBanner.innerText = "IT'S YOUR TURN";
@@ -80,18 +90,34 @@ function handleMouseActions() {
   //set up our event listeners to see whether the mouse is on the canvas
   checkWhichSquare(
     gridSquares,
-    canvas.width / 10,
-    canvas.height / 10,
+    canvas.width / (numXRows * 2),
+    canvas.height / (numYRows * 2),
     ctx,
     currentSquare,
     playerChoices,
-    otherPlayerChoices
+    otherPlayerChoices,
+    boardColor,
+    boardHighlight
   );
-  //add all x's
-  createImage(ctx, playerChoices, 100, 100);
 
-  //add other players o's
-  createOImage(ctx, otherPlayerChoices, 96, 96);
+  //hope to combine these two functions into one function where we can pass
+  //an o or an x as a param
+  //add all x's
+  createImage(
+    ctx,
+    playerChoices,
+    canvas.width / numXRows,
+    canvas.height / numYRows
+  );
+
+  //add other players o's - we minus 4 as the o image looks bad due to touching
+  //the edges of the square
+  createOImage(
+    ctx,
+    otherPlayerChoices,
+    canvas.width / numXRows - 4,
+    canvas.height / numYRows - 4
+  );
 }
 
 //add an event listener which will add selection of square to the player choice array
@@ -99,7 +125,7 @@ canvas.addEventListener("click", () => {
   if (!isMyTurn) return;
   if (checkIsClicked(currentSquare, playerChoices, otherPlayerChoices) === true)
     return;
-  playerSelect(currentSquare, playerChoices, ctx);
+  playerSelect(currentSquare, playerChoices, ctx, boardColor);
   createImage(ctx, playerChoices, 100, 100);
   checkWin(playerChoices, isWinner);
   sendChoiceInfo();
@@ -109,7 +135,10 @@ canvas.addEventListener("click", () => {
 const sendChoiceInfo = () => {
   socket.emit("selectionInfo", playerChoices);
   isMyTurn = false;
-  turnBanner.classList.add("hidden");
+  turnBanner.innerText = `It is ${otherPlayerName}'s Turn`;
+  const body = document.querySelector("body");
+  body.style.backgroundImage = "radial-gradient(#9e9d9d,black)";
+  canvas.style.filter = "brightness(0.5)";
 
   if (isWinner.playerWin) {
     //we emit the event in the case of a win
@@ -117,6 +146,9 @@ const sendChoiceInfo = () => {
       playerName: myName,
       winningArray: isWinner.winningArray,
     });
+    document.querySelector("body").style.backgroundImage =
+      "radial-gradient(white, #ffbf00,	#261d00)"; //#614901
+    document.getElementById("canvas").style.filter = "brightness(1)";
     doWin(
       isWinner.winningArray,
       myName,
@@ -134,10 +166,17 @@ socket.on("selectionInfo", (choiceArray) => {
   createOImage(ctx, otherPlayerChoices, 96, 96);
   isMyTurn = true;
   turnBanner.classList.remove("hidden");
+  turnBanner.innerText = "IT'S YOUR TURN";
+  const body = document.querySelector("body");
+  body.style.backgroundImage = "radial-gradient(white,black)";
+  canvas.style.filter = "brightness(1)";
 });
 
 //when we receive the winning notification from the server
 socket.on("other-player-wins", (winningInfo) => {
+  document.querySelector("body").style.backgroundImage =
+    "radial-gradient(white,#cc3010,black)";
+  document.getElementById("canvas").style.filter = "brightness(1)";
   doWin(
     winningInfo.winningArray,
     winningInfo.playerName,

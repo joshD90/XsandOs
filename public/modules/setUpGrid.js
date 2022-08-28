@@ -6,7 +6,7 @@ export const lineWidth = 4;
 
 //use loop to draw x and y grid lines
 function drawGrid(gridSquares, xGrid, yGrid) {
-  //draw a verticle line from top to bottom of canvas at intervals set by gridX param
+  //draw a verticle line from top to bottom of canvas at intervals set by xGrid param
   for (let i = 0; i < xGrid; i++) {
     ctx.beginPath();
     const middlePoint = gridSquares.find((elem) => elem.coord.x === i);
@@ -47,8 +47,6 @@ function setGridSquares(gridSquares, numXRows, numYRows) {
       gridSquares.push({ coord: coord, center: center });
     }
   }
-  drawGridCenter(gridSquares);
-  return console.log(gridSquares);
 }
 //just a way of checking whether the gridCenter, center property is returning the correct value
 function drawGridCenter(gridSquares) {
@@ -71,12 +69,6 @@ function setUpGrid(gridSquares, xGrid, yGrid) {
   setGridSquares(gridSquares, xGrid, yGrid);
   //now draw lines based on grid points
   drawGrid(gridSquares, xGrid, yGrid);
-
-  //draw a square at the center of each square
-  drawGridCenter(gridSquares);
-  //checking whether a diagonal line runs through the centers to make sure they aren't off center
-  //drawLine(gridSquares[2].center, gridSquares[6].center);
-  //drawLine({ x: 0, y: 0 }, { x: 500, y: 500 });
 }
 
 export { setUpGrid, drawLine, setGridSquares, drawGrid, drawGridCenter };

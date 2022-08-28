@@ -9,10 +9,13 @@ h1 {
 .bannerDiv {
   text-align: center;
   border: 1px solid black;
-  min-height: 120px;
+  min-height: 90px;
   width: 70%;
   margin: auto auto;
   margin-bottom: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
 
 .playBoard {

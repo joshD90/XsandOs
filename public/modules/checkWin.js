@@ -37,8 +37,7 @@ function checkNext(
   isWinner
 ) {
   //we check if the count has reach 3 and exit the recursive loop if it has
-  if (count === 2) {
-    alert("WE HAVE A WINNER");
+  if (count === 3) {
     isWinner.playerWin = true;
     isWinner.winningArray = winningArray;
     console.log(isWinner);

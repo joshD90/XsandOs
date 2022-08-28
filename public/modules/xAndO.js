@@ -1,5 +1,7 @@
 const canvas = document.getElementById("canvas");
-
+//this image goes to the center point of a square and subtracts half the
+//width and height to get to the top left hand corner where it can then draw
+//the image
 export function createImage(ctx, playerSelectArray, width, height) {
   playerSelectArray.forEach((elem) => {
     let link = new Image();
@@ -15,7 +17,7 @@ export function createImage(ctx, playerSelectArray, width, height) {
     };
   });
 }
-
+//same as above (hope to combine these two together shortly)
 export function createOImage(ctx, otherPlayerArray, width, height) {
   otherPlayerArray.forEach((elem) => {
     let o = new Image();
@@ -58,7 +60,7 @@ export function checkIsClicked(
   return false;
 }
 
-export function playerSelect(currentSquare, playerChoice, ctx) {
+export function playerSelect(currentSquare, playerChoice, ctx, boardColor) {
   if (
     playerChoice.some(
       (elem) =>
@@ -68,7 +70,7 @@ export function playerSelect(currentSquare, playerChoice, ctx) {
   )
     return;
   ctx.beginPath();
-  ctx.fillStyle = "#346b31";
+  ctx.fillStyle = boardColor;
   ctx.fillRect(
     currentSquare.current.center.x - 48,
     currentSquare.current.center.y - 48,
