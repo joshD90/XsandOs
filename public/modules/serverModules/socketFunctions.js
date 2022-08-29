@@ -40,4 +40,11 @@ function checkWhichRoom(socket, rooms) {
   console.log(rooms);
 }
 
-module.exports = { assignRooms, checkWhichRoom };
+const getUserRoom = (users, socket) => {
+  const userToChange = users.find((user) => user.userID === socket.id);
+  const indexOfUser = users.indexOf(userToChange);
+  const myRoom = users[indexOfUser].roomName;
+  return myRoom;
+};
+
+module.exports = { assignRooms, checkWhichRoom, getUserRoom };

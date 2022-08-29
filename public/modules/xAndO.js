@@ -2,33 +2,19 @@ const canvas = document.getElementById("canvas");
 //this image goes to the center point of a square and subtracts half the
 //width and height to get to the top left hand corner where it can then draw
 //the image
-export function createImage(ctx, playerSelectArray, width, height) {
+export function createImage(ctx, playerSelectArray, width, height, symbol) {
   playerSelectArray.forEach((elem) => {
-    let link = new Image();
-    link.src = "/assets/xImage.png";
-    link.onload = function () {
+    let img = new Image();
+    img.src = `/assets/${symbol}Image.png`;
+    img.onload = function () {
       ctx.drawImage(
-        link,
+        img,
         elem.center.x - width / 2,
         elem.center.y - height / 2,
         width,
         height
       );
     };
-  });
-}
-//same as above (hope to combine these two together shortly)
-export function createOImage(ctx, otherPlayerArray, width, height) {
-  otherPlayerArray.forEach((elem) => {
-    let o = new Image();
-    o.src = "/assets/oImage.png";
-    ctx.drawImage(
-      o,
-      elem.center.x - width / 2,
-      elem.center.y - height / 2,
-      width,
-      height
-    );
   });
 }
 
@@ -60,7 +46,14 @@ export function checkIsClicked(
   return false;
 }
 
-export function playerSelect(currentSquare, playerChoice, ctx, boardColor) {
+export function playerSelect(
+  currentSquare,
+  playerChoice,
+  ctx,
+  boardColor,
+  width,
+  height
+) {
   if (
     playerChoice.some(
       (elem) =>
@@ -72,10 +65,10 @@ export function playerSelect(currentSquare, playerChoice, ctx, boardColor) {
   ctx.beginPath();
   ctx.fillStyle = boardColor;
   ctx.fillRect(
-    currentSquare.current.center.x - 48,
-    currentSquare.current.center.y - 48,
-    96,
-    96
+    currentSquare.current.center.x - (width / 2 - 2),
+    currentSquare.current.center.y - (height / 2 - 2),
+    width - 4,
+    height - 4
   );
   playerChoice.push(currentSquare.current);
 }

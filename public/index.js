@@ -1,13 +1,16 @@
 import { drawLine, setUpGrid } from "./modules/setUpGrid.js";
 import { getMousePosition, checkWhichSquare } from "./modules/mouseMove.js";
-import {
-  createImage,
-  playerSelect,
-  createOImage,
-  checkIsClicked,
-} from "./modules/xAndO.js";
+import { createImage, playerSelect, checkIsClicked } from "./modules/xAndO.js";
 import { checkWin } from "./modules/checkWin.js";
 import { doWin } from "./modules/winLine.js";
+import {
+  applyIsTurnStyle,
+  applyNotTurn,
+  applyWinStyle,
+  applyLoseStyle,
+  applyHighlightTurn,
+} from "./modules/changeStyles.js";
+import { playSound } from "./modules/playSound.js";
 
 //set up our socket
 const socket = io();
@@ -84,10 +87,12 @@ getMousePosition();
 
 canvas.addEventListener("mousemove", handleMouseActions);
 
+//all board refresh options are fed through the mouse move
 function handleMouseActions() {
   //check to see if there is a winner and stop drawing if so
   if (isWinner.playerWin) return;
   //set up our event listeners to see whether the mouse is on the canvas
+
   checkWhichSquare(
     gridSquares,
     canvas.width / (numXRows * 2),
@@ -107,38 +112,52 @@ function handleMouseActions() {
     ctx,
     playerChoices,
     canvas.width / numXRows,
-    canvas.height / numYRows
+    canvas.height / numYRows,
+    "x"
   );
 
   //add other players o's - we minus 4 as the o image looks bad due to touching
   //the edges of the square
-  createOImage(
+  createImage(
     ctx,
     otherPlayerChoices,
     canvas.width / numXRows - 4,
-    canvas.height / numYRows - 4
+    canvas.height / numYRows - 4,
+    "o"
   );
 }
 
 //add an event listener which will add selection of square to the player choice array
 canvas.addEventListener("click", () => {
-  if (!isMyTurn) return;
+  if (!isMyTurn) return applyHighlightTurn();
   if (checkIsClicked(currentSquare, playerChoices, otherPlayerChoices) === true)
     return;
-  playerSelect(currentSquare, playerChoices, ctx, boardColor);
-  createImage(ctx, playerChoices, 100, 100);
+  playerSelect(
+    currentSquare,
+    playerChoices,
+    ctx,
+    boardColor,
+    canvas.width / numXRows,
+    canvas.width / numYRows
+  );
+  createImage(
+    ctx,
+    playerChoices,
+    canvas.width / numXRows,
+    canvas.height / numYRows,
+    "x"
+  );
   checkWin(playerChoices, isWinner);
   sendChoiceInfo();
 });
 
+console.log(socket.id);
 //function to send player Info to other player
 const sendChoiceInfo = () => {
+  playSound("placeSymbol.wav");
   socket.emit("selectionInfo", playerChoices);
   isMyTurn = false;
-  turnBanner.innerText = `It is ${otherPlayerName}'s Turn`;
-  const body = document.querySelector("body");
-  body.style.backgroundImage = "radial-gradient(#9e9d9d,black)";
-  canvas.style.filter = "brightness(0.5)";
+  applyNotTurn(otherPlayerName);
 
   if (isWinner.playerWin) {
     //we emit the event in the case of a win
@@ -146,9 +165,11 @@ const sendChoiceInfo = () => {
       playerName: myName,
       winningArray: isWinner.winningArray,
     });
-    document.querySelector("body").style.backgroundImage =
-      "radial-gradient(white, #ffbf00,	#261d00)"; //#614901
-    document.getElementById("canvas").style.filter = "brightness(1)";
+    //we change the styles associated with winning
+    applyWinStyle();
+    //play winning Sound
+    playSound("win.wav");
+    //carry out win functions
     doWin(
       isWinner.winningArray,
       myName,
@@ -163,20 +184,22 @@ const sendChoiceInfo = () => {
 //sets up a listener to check for any new input from other user
 socket.on("selectionInfo", (choiceArray) => {
   otherPlayerChoices = choiceArray;
-  createOImage(ctx, otherPlayerChoices, 96, 96);
+
+  createImage(
+    ctx,
+    otherPlayerChoices,
+    canvas.width / numXRows - 4,
+    canvas.width / numYRows - 4,
+    "o"
+  );
   isMyTurn = true;
-  turnBanner.classList.remove("hidden");
-  turnBanner.innerText = "IT'S YOUR TURN";
-  const body = document.querySelector("body");
-  body.style.backgroundImage = "radial-gradient(white,black)";
-  canvas.style.filter = "brightness(1)";
+  applyIsTurnStyle();
 });
 
 //when we receive the winning notification from the server
 socket.on("other-player-wins", (winningInfo) => {
-  document.querySelector("body").style.backgroundImage =
-    "radial-gradient(white,#cc3010,black)";
-  document.getElementById("canvas").style.filter = "brightness(1)";
+  applyLoseStyle();
+  playSound("lose.wav");
   doWin(
     winningInfo.winningArray,
     winningInfo.playerName,

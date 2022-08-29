@@ -48,14 +48,15 @@ export function checkWhichSquare(
         currentSquare.current = elem;
         //now we check to see whether this square we are hovering has already
         //been selected by our player
+        //and also check to see whether the other player has selected the hovered
+        //square already
+
         if (
           !playerSquares.some(
             (playElem) =>
               playElem.coord.x === elem.coord.x &&
               playElem.coord.y === elem.coord.y
           ) &&
-          //and also check to see whether the other player has selected the hovered
-          //square already
           !otherPlayerSquares.some(
             (otherElem) =>
               otherElem.coord.x === elem.coord.x &&
@@ -80,6 +81,11 @@ export function checkWhichSquare(
             (playElem) =>
               playElem.coord.x === elem.coord.x &&
               playElem.coord.y === elem.coord.y
+          ) &&
+          !otherPlayerSquares.some(
+            (otherElem) =>
+              otherElem.coord.x === elem.coord.x &&
+              otherElem.coord.y === elem.coord.y
           )
         ) {
           ctx.beginPath();
@@ -99,6 +105,11 @@ export function checkWhichSquare(
           (playElem) =>
             playElem.coord.x === elem.coord.x &&
             playElem.coord.y === elem.coord.y
+        ) &&
+        !otherPlayerSquares.some(
+          (otherElem) =>
+            otherElem.coord.x === elem.coord.x &&
+            otherElem.coord.y === elem.coord.y
         )
       ) {
         ctx.beginPath();

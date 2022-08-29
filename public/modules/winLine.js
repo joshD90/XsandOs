@@ -64,6 +64,7 @@ export function doWin(
 ) {
   //set up a win message depending on who is the winner
   let bannerMessage;
+
   if (whoWins === myName) {
     bannerMessage = "YOU ARE THE WINNER";
   } else {

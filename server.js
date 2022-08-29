@@ -8,6 +8,7 @@ const { Server } = require("socket.io");
 const {
   assignRooms,
   checkWhichRoom,
+  getUserRoom,
 } = require("./public/modules/serverModules/socketFunctions");
 //link socket.io to sever
 const io = new Server(server);
@@ -65,18 +66,22 @@ io.on("connection", (socket) => {
     const indexOfUser = users.indexOf(userToChange);
     users[indexOfUser].username = playername;
     const myRoom = users[indexOfUser].roomName;
-    //see what room and username have been assigned
-    console.log(users, "USERS ON SEND MESSAGE");
+
+    socket.nickname = playername;
+    const currentRooms = socket.rooms;
+    console.log([...currentRooms], "CURRENT ROOMS ARRAY");
+    const roomUsers = io.sockets.adapter.rooms.get([...currentRooms][1]);
+    console.log(roomUsers, "users of the room");
+    const userArray = [...roomUsers];
+    console.log(userArray, "array of users");
+
     //emit the chosen nickname to the other player
     socket.to(myRoom).emit("receive-name", playername);
   });
 
   //set up listener for the winner
   socket.on("player-wins", (winningInfo) => {
-    console.log("This is unbelievable we have a WINNER");
-    const userToChange = users.find((user) => user.userID === socket.id);
-    const indexOfUser = users.indexOf(userToChange);
-    const myRoom = users[indexOfUser].roomName;
+    const myRoom = getUserRoom(users, socket);
     //broadcast the winning playername and the winning array associated
     socket.to(myRoom).emit("other-player-wins", winningInfo);
   });
@@ -88,7 +93,8 @@ io.on("connection", (socket) => {
   });
   //set up listener for change in player selection
   socket.on("selectionInfo", (info) => {
-    socket.broadcast.emit("selectionInfo", info);
+    const myRoom = getUserRoom(users, socket);
+    socket.to(myRoom).emit("selectionInfo", info);
   });
 });
 
