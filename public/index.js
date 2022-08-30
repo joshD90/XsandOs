@@ -151,7 +151,6 @@ canvas.addEventListener("click", () => {
   sendChoiceInfo();
 });
 
-console.log(socket.id);
 //function to send player Info to other player
 const sendChoiceInfo = () => {
   playSound("placeSymbol.wav");
@@ -208,4 +207,8 @@ socket.on("other-player-wins", (winningInfo) => {
     myName,
     handleMouseActions
   );
+});
+
+socket.on("players-turn", (turnInfo) => {
+  console.log(turnInfo);
 });

@@ -57,7 +57,7 @@ io.on("connection", (socket) => {
     );
   });
   // //set up listener for player sending over their username
-  socket.on("send-username", (playername) => {
+  socket.on("send-username", async (playername) => {
     //find the index of the user in the user array
     //unfortunately this only updates a local user array and is not passed to
     //other users. We will use this to determine which room we will be emitting
@@ -67,13 +67,28 @@ io.on("connection", (socket) => {
     users[indexOfUser].username = playername;
     const myRoom = users[indexOfUser].roomName;
 
-    socket.nickname = playername;
-    const currentRooms = socket.rooms;
-    console.log([...currentRooms], "CURRENT ROOMS ARRAY");
-    const roomUsers = io.sockets.adapter.rooms.get([...currentRooms][1]);
-    console.log(roomUsers, "users of the room");
-    const userArray = [...roomUsers];
-    console.log(userArray, "array of users");
+    socket.data.username = playername.name;
+    socket.data.otherData = { turn: false };
+    // const currentRooms = socket.rooms;
+    // console.log([...currentRooms], "CURRENT ROOMS ARRAY");
+    // const roomUsers = io.sockets.adapter.rooms.get([...currentRooms][1]);
+    // console.log(roomUsers, "users of the room");
+    // const userArray = [...roomUsers];
+    // console.log(userArray, "array of users");
+
+    const sockets = await io.in(myRoom).fetchSockets();
+
+    const socketNames = sockets.map((elem) => elem.data.username);
+    console.log(socketNames);
+    if (sockets.length === 2) {
+      const randomNum = Math.floor(Math.random() * 2);
+      const turnObj = {
+        yourId: socket.id,
+        yourName: socket.data.username,
+        whosTurn: sockets[randomNum].data.username,
+      };
+      socket.to(myRoom).emit("players-turn", turnObj);
+    }
 
     //emit the chosen nickname to the other player
     socket.to(myRoom).emit("receive-name", playername);

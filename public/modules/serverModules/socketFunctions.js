@@ -31,13 +31,14 @@ function assignRooms(socket, rooms, roomArray, users) {
     users[indexOfUser].roomName = `Room${roomArray.length}`;
   }
 
-  roomArray.forEach((elem) =>
-    console.log("for each", elem, rooms.get(elem), "newRoomList")
+  roomArray.forEach(
+    (elem) => {}
+    //console.log("for each", elem, rooms.get(elem), "newRoomList")
   );
 }
 
 function checkWhichRoom(socket, rooms) {
-  console.log(rooms);
+  //console.log(rooms);
 }
 
 const getUserRoom = (users, socket) => {
