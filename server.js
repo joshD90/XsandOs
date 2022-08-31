@@ -9,6 +9,7 @@ const {
   assignRooms,
   checkWhichRoom,
   getUserRoom,
+  setTurn,
 } = require("./public/modules/serverModules/socketFunctions");
 //link socket.io to sever
 const io = new Server(server);
@@ -46,6 +47,8 @@ io.on("connection", (socket) => {
   let newRoomList = [];
   //we assign all users as they connect 2 to a room
   assignRooms(socket, rooms, newRoomList, users);
+  //send the new user back their id
+  io.to(socket.id).emit("my-id", socket.id);
 
   //set up listener for disconnection
   socket.on("disconnect", () => {
@@ -57,41 +60,11 @@ io.on("connection", (socket) => {
     );
   });
   // //set up listener for player sending over their username
-  socket.on("send-username", async (playername) => {
-    //find the index of the user in the user array
-    //unfortunately this only updates a local user array and is not passed to
-    //other users. We will use this to determine which room we will be emitting
-    //to
-    const userToChange = users.find((user) => user.userID === socket.id);
-    const indexOfUser = users.indexOf(userToChange);
-    users[indexOfUser].username = playername;
-    const myRoom = users[indexOfUser].roomName;
-
-    socket.data.username = playername.name;
-    socket.data.otherData = { turn: false };
-    // const currentRooms = socket.rooms;
-    // console.log([...currentRooms], "CURRENT ROOMS ARRAY");
-    // const roomUsers = io.sockets.adapter.rooms.get([...currentRooms][1]);
-    // console.log(roomUsers, "users of the room");
-    // const userArray = [...roomUsers];
-    // console.log(userArray, "array of users");
-
-    const sockets = await io.in(myRoom).fetchSockets();
-
-    const socketNames = sockets.map((elem) => elem.data.username);
-    console.log(socketNames);
-    if (sockets.length === 2) {
-      const randomNum = Math.floor(Math.random() * 2);
-      const turnObj = {
-        yourId: socket.id,
-        yourName: socket.data.username,
-        whosTurn: sockets[randomNum].data.username,
-      };
-      socket.to(myRoom).emit("players-turn", turnObj);
-    }
-
-    //emit the chosen nickname to the other player
-    socket.to(myRoom).emit("receive-name", playername);
+  socket.on("send-username", (playername) => {
+    //once the user has sent over the username, this function will
+    //check whether both users are connected and have sent over their
+    //name and then emit a signal to start the turn again
+    setTurn(socket, io, playername);
   });
 
   //set up listener for the winner

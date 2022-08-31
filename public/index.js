@@ -42,6 +42,8 @@ const boardHighlight = "#87e082";
 //set up other player name
 let myName;
 let otherPlayerName;
+let myID;
+let mySymbol;
 //player turn and win conditions
 let isMyTurn;
 let isWinner = { playerWin: false, winningArray: [] };
@@ -53,38 +55,48 @@ function doStart(e) {
   if (otherPlayerName) {
     socket.emit("send-username", {
       name: myName,
-      requestInfo: false,
-      yourTurn: true,
     });
-  } else socket.emit("send-username", { name: myName, requestInfo: true });
+  } else socket.emit("send-username", { name: myName });
   startDiv.classList.add("hidden");
 }
+
+//recieve the id for the socket that we are ussing so that we
+//can use this later
+socket.on("my-id", (id) => {
+  myID = id;
+  console.log(`My Id is ${myID}`);
+});
 
 //call our grid / squares set up
 setUpGrid(gridSquares, numXRows, numYRows);
 
-//now we check whether the other user has connected
-socket.on("receive-name", (otherPlayerInfo) => {
-  otherPlayerName = otherPlayerInfo.name;
-  if (otherPlayerInfo.yourTurn) {
+//now we wait until the server detects that both players are detected and have set a name
+socket.on("set-turn", (info) => {
+  console.log(info, "this is the entire info object getting sent over");
+  console.log(info.whosTurn);
+  otherPlayerName = info.allPlayers.filter((elem) => elem.socketID !== myID)[0]
+    .socketName.name;
+  console.log(otherPlayerName, "OTHER PLAYER NAME");
+
+  const playerBanner = document.querySelector(".playerConnectionBanner");
+  playerBanner.innerText = `You have connected with ${otherPlayerName}`;
+  if (info.whosTurn.socketID === myID) {
+    console.log("ITS MY TURN");
     isMyTurn = true;
     turnBanner.innerText = "IT'S YOUR TURN";
     turnBanner.classList.remove("hidden");
+    mySymbol = ["x", "o"];
+  } else {
+    turnBanner.innerText = `IT'S ${otherPlayerName}'s turn`;
+    turnBanner.classList.remove("hidden");
+    mySymbol = ["o", "x"];
   }
-  if (otherPlayerInfo.requestInfo && myName)
-    socket.emit("send-username", {
-      name: myName,
-      requestInfo: false,
-      yourTurn: true,
-    });
-  const playerBanner = document.querySelector(".playerConnectionBanner");
-  playerBanner.innerText = `You have connected with ${otherPlayerInfo.name}`;
 });
 
 //get our mousePosition - this sets up a listener which will feed back the mouse
 //position to the modules local variable
 getMousePosition();
-
+//this add our mouse move function attached to the mouse moving on the canvas.
 canvas.addEventListener("mousemove", handleMouseActions);
 
 //all board refresh options are fed through the mouse move
@@ -113,7 +125,7 @@ function handleMouseActions() {
     playerChoices,
     canvas.width / numXRows,
     canvas.height / numYRows,
-    "x"
+    mySymbol[0]
   );
 
   //add other players o's - we minus 4 as the o image looks bad due to touching
@@ -123,7 +135,7 @@ function handleMouseActions() {
     otherPlayerChoices,
     canvas.width / numXRows - 4,
     canvas.height / numYRows - 4,
-    "o"
+    mySymbol[1]
   );
 }
 
@@ -145,7 +157,7 @@ canvas.addEventListener("click", () => {
     playerChoices,
     canvas.width / numXRows,
     canvas.height / numYRows,
-    "x"
+    mySymbol[0]
   );
   checkWin(playerChoices, isWinner);
   sendChoiceInfo();
@@ -189,7 +201,7 @@ socket.on("selectionInfo", (choiceArray) => {
     otherPlayerChoices,
     canvas.width / numXRows - 4,
     canvas.width / numYRows - 4,
-    "o"
+    mySymbol[1]
   );
   isMyTurn = true;
   applyIsTurnStyle();
@@ -209,6 +221,6 @@ socket.on("other-player-wins", (winningInfo) => {
   );
 });
 
-socket.on("players-turn", (turnInfo) => {
+socket.on("set-turn", (turnInfo) => {
   console.log(turnInfo);
 });
