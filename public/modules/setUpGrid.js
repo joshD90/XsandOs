@@ -6,6 +6,8 @@ export const lineWidth = 4;
 
 //use loop to draw x and y grid lines
 function drawGrid(gridSquares, xGrid, yGrid) {
+  console.log("i am being called here drawgrid function");
+
   //draw a verticle line from top to bottom of canvas at intervals set by xGrid param
   for (let i = 0; i < xGrid; i++) {
     ctx.beginPath();
@@ -14,6 +16,7 @@ function drawGrid(gridSquares, xGrid, yGrid) {
     console.log(gridWidth);
     const startPointX = middlePoint.center.x + gridWidth / 2 - lineWidth / 2;
 
+    ctx.fillStyle = "black";
     ctx.fillRect(startPointX, 0, lineWidth, canvas.height);
   }
   //do the same for the horizontal lines

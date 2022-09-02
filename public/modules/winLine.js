@@ -75,7 +75,8 @@ export function doWin(
 
   //we clear the banner area
   const bannerDiv = document.querySelector(".bannerDiv");
-  bannerDiv.innerHTML = "";
+  document.querySelector(".playerConnectionBanner").classList.add("hidden");
+  document.querySelector(".turnBanner").classList.add("hidden");
   //now create the new banner, add text and class
   const winBanner = document.createElement("h1");
   winBanner.innerText = bannerMessage;

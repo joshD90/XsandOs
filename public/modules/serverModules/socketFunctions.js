@@ -32,10 +32,6 @@ function assignRooms(socket, rooms, roomArray, users) {
   }
 }
 
-function checkWhichRoom(socket, rooms) {
-  //console.log(rooms);
-}
-
 const getUserRoom = (users, socket) => {
   const userToChange = users.find((user) => user.userID === socket.id);
   const indexOfUser = users.indexOf(userToChange);
@@ -73,4 +69,4 @@ async function setTurn(socket, io, playername) {
   }
 }
 
-module.exports = { assignRooms, checkWhichRoom, getUserRoom, setTurn };
+module.exports = { assignRooms, getUserRoom, setTurn };

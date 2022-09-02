@@ -11,6 +11,7 @@ import {
   applyHighlightTurn,
 } from "./modules/changeStyles.js";
 import { playSound } from "./modules/playSound.js";
+import { initiateRestart } from "./modules/restart.js";
 
 //set up our socket
 const socket = io();
@@ -50,13 +51,9 @@ let isWinner = { playerWin: false, winningArray: [] };
 
 function doStart(e) {
   e.preventDefault();
-  console.log(nameInput.value);
+
   myName = nameInput.value;
-  if (otherPlayerName) {
-    socket.emit("send-username", {
-      name: myName,
-    });
-  } else socket.emit("send-username", { name: myName });
+  socket.emit("send-username", { name: myName });
   startDiv.classList.add("hidden");
 }
 
@@ -72,23 +69,21 @@ setUpGrid(gridSquares, numXRows, numYRows);
 
 //now we wait until the server detects that both players are detected and have set a name
 socket.on("set-turn", (info) => {
-  console.log(info, "this is the entire info object getting sent over");
-  console.log(info.whosTurn);
   otherPlayerName = info.allPlayers.filter((elem) => elem.socketID !== myID)[0]
     .socketName.name;
-  console.log(otherPlayerName, "OTHER PLAYER NAME");
-
+  //we check update the banner text
   const playerBanner = document.querySelector(".playerConnectionBanner");
   playerBanner.innerText = `You have connected with ${otherPlayerName}`;
+  //if our player has been randomly assigned as starter
   if (info.whosTurn.socketID === myID) {
-    console.log("ITS MY TURN");
+    //set turn variable and update styles and innertext
     isMyTurn = true;
-    turnBanner.innerText = "IT'S YOUR TURN";
-    turnBanner.classList.remove("hidden");
+    applyIsTurnStyle();
+    //when setting our own symbol we will always take the first element of the symbol array for ourselves and the second
+    // element for the opponent, so rather than passing a variable into the set symbol function we simply change the arrangement of the symbol array
     mySymbol = ["x", "o"];
   } else {
-    turnBanner.innerText = `IT'S ${otherPlayerName}'s turn`;
-    turnBanner.classList.remove("hidden");
+    applyNotTurn(otherPlayerName);
     mySymbol = ["o", "x"];
   }
 });
@@ -189,6 +184,16 @@ const sendChoiceInfo = () => {
       myName,
       handleMouseActions
     );
+    initiateRestart(
+      playerChoices,
+      otherPlayerChoices,
+      socket,
+      myName,
+      gridSquares,
+      numXRows,
+      4,
+      boardColor
+    );
   }
 };
 
@@ -218,6 +223,16 @@ socket.on("other-player-wins", (winningInfo) => {
     canvas,
     myName,
     handleMouseActions
+  );
+  initiateRestart(
+    playerChoices,
+    otherPlayerChoices,
+    socket,
+    myName,
+    gridSquares,
+    numXRows,
+    4,
+    boardColor
   );
 });
 
