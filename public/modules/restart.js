@@ -17,57 +17,37 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 export function initiateRestart(
-  mySelection,
-  otherPlayerSelection,
   socket,
   myName,
   gridSquares,
-  numXRows,
-  lineWidth,
-  boardColor
+  boardColor,
+  isWinner
 ) {
-  mySelection = [];
-  otherPlayerSelection = [];
   setTimeout(() => {
     restartDiv.classList.remove("hidden");
+    document.querySelector(".playBoard").classList.add("blurFilter");
     btnRematch.addEventListener("click", () => {
-      doRematch(socket, myName, gridSquares, numXRows, lineWidth, boardColor);
+      doRematch(socket, myName, gridSquares, boardColor, isWinner);
     });
     btnDisconnect.addEventListener("click", disconnect);
-  }, 3000);
+  }, 1000);
 }
 
-function doRematch(
-  socket,
-  myName,
-  gridSquares,
-  numXRows,
-  lineWidth,
-  boardColor
-) {
-  socket.emit("send-username", { name: myName });
+function doRematch(socket, myName, gridSquares, boardColor, isWinner) {
+  socket.emit("restart-game", { name: myName });
 
-  console.log(gridSquares, "gridSquares from rematch");
-
-  // gridSquares.forEach((square) => {
-  //   const width = canvas.width / numXRows;
-  //   const startPointX = square.center.x - (width / 2 - lineWidth / 2);
-  //   const startPointY = square.center.y - (width / 2 - lineWidth / 2);
-
-  //   ctx.fillStyle = boardColor;
-  //   ctx.fillRect(
-  //     startPointX,
-  //     startPointY,
-  //     width - lineWidth,
-  //     width - lineWidth
-  //   );
-  // });
+  //remove the blur filter from the baord form rematch
+  document.querySelector(".playBoard").classList.remove("blurFilter");
+  //draw over the whole board with background color
   ctx.fillStyle = boardColor;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  //add in the grid lines
   drawGrid(gridSquares, 5, 5);
-  console.log("grid should have been drawn now");
-
+  //hide our restart div button
   restartDiv.classList.add("hidden");
+  //Change message for the banner
+  document.querySelector(".winBanner").innerText =
+    "Waiting on Other Player to Confirm Rematch";
 }
 
 function disconnect() {

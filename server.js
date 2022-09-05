@@ -67,6 +67,20 @@ io.on("connection", (socket) => {
     setTurn(socket, io, playername);
   });
 
+  socket.on("restart-game", async (playername) => {
+    //globally show that this player is ready to play again
+    socket.data.restart = true;
+    const myRoom = [...socket.rooms][1];
+
+    const sockets = await io.in(myRoom).fetchSockets();
+    //see whether both sockets are ready to play again
+    const socketsRestartTrue = sockets.filter(
+      (elem) => elem.data.restart === true
+    );
+
+    if (socketsRestartTrue.length === 2) return setTurn(socket, io, playername);
+  });
+
   //set up listener for the winner
   socket.on("player-wins", (winningInfo) => {
     const myRoom = getUserRoom(users, socket);

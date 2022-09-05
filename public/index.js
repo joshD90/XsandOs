@@ -28,11 +28,11 @@ startButton.addEventListener("click", doStart);
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 //set up an array to put our grid co-ordinates as well as properties for each square
-const gridSquares = [];
+let gridSquares = [];
 //set up a variable that updates depending on which square the mouse is hovered over
 let currentSquare = { current: {} };
 //set up array to hold all the squares the player has clicked
-const playerChoices = [];
+let playerChoices = [];
 //set up the other players choice array
 let otherPlayerChoices = [];
 //board variables
@@ -69,10 +69,24 @@ setUpGrid(gridSquares, numXRows, numYRows);
 
 //now we wait until the server detects that both players are detected and have set a name
 socket.on("set-turn", (info) => {
+  console.log(info, "params on reciept of setTurn");
+
+  //get our mousePosition - this sets up a listener which will feed back the mouse
+  //position to the modules local variable
+  getMousePosition();
+  //this add our mouse move function attached to the mouse moving on the canvas.
+  canvas.addEventListener("mousemove", handleMouseActions);
+
+  //add an event listener which will add selection of square to the player choice array
+  canvas.addEventListener("click", canvasClick);
+
   otherPlayerName = info.allPlayers.filter((elem) => elem.socketID !== myID)[0]
     .socketName.name;
   //we check update the banner text
+  const winBanner = document.querySelector(".winBanner");
+  winBanner && winBanner.remove();
   const playerBanner = document.querySelector(".playerConnectionBanner");
+  playerBanner.classList.remove("hidden");
   playerBanner.innerText = `You have connected with ${otherPlayerName}`;
   //if our player has been randomly assigned as starter
   if (info.whosTurn.socketID === myID) {
@@ -83,16 +97,11 @@ socket.on("set-turn", (info) => {
     // element for the opponent, so rather than passing a variable into the set symbol function we simply change the arrangement of the symbol array
     mySymbol = ["x", "o"];
   } else {
+    isMyTurn = false;
     applyNotTurn(otherPlayerName);
     mySymbol = ["o", "x"];
   }
 });
-
-//get our mousePosition - this sets up a listener which will feed back the mouse
-//position to the modules local variable
-getMousePosition();
-//this add our mouse move function attached to the mouse moving on the canvas.
-canvas.addEventListener("mousemove", handleMouseActions);
 
 //all board refresh options are fed through the mouse move
 function handleMouseActions() {
@@ -134,30 +143,6 @@ function handleMouseActions() {
   );
 }
 
-//add an event listener which will add selection of square to the player choice array
-canvas.addEventListener("click", () => {
-  if (!isMyTurn) return applyHighlightTurn();
-  if (checkIsClicked(currentSquare, playerChoices, otherPlayerChoices) === true)
-    return;
-  playerSelect(
-    currentSquare,
-    playerChoices,
-    ctx,
-    boardColor,
-    canvas.width / numXRows,
-    canvas.width / numYRows
-  );
-  createImage(
-    ctx,
-    playerChoices,
-    canvas.width / numXRows,
-    canvas.height / numYRows,
-    mySymbol[0]
-  );
-  checkWin(playerChoices, isWinner);
-  sendChoiceInfo();
-});
-
 //function to send player Info to other player
 const sendChoiceInfo = () => {
   playSound("placeSymbol.wav");
@@ -175,6 +160,8 @@ const sendChoiceInfo = () => {
     applyWinStyle();
     //play winning Sound
     playSound("win.wav");
+    //remove the click on canvas listener so board can't be altered
+    canvas.removeEventListener("click", canvasClick);
     //carry out win functions
     doWin(
       isWinner.winningArray,
@@ -184,16 +171,11 @@ const sendChoiceInfo = () => {
       myName,
       handleMouseActions
     );
-    initiateRestart(
-      playerChoices,
-      otherPlayerChoices,
-      socket,
-      myName,
-      gridSquares,
-      numXRows,
-      4,
-      boardColor
-    );
+    playerChoices = [];
+    otherPlayerChoices = [];
+    isWinner.winningArray = [];
+    isWinner.playerWin = false;
+    initiateRestart(socket, myName, gridSquares, boardColor, isWinner);
   }
 };
 
@@ -216,6 +198,8 @@ socket.on("selectionInfo", (choiceArray) => {
 socket.on("other-player-wins", (winningInfo) => {
   applyLoseStyle();
   playSound("lose.wav");
+  //remove the click on canvas listener so board can't be altered
+  canvas.removeEventListener("click", canvasClick);
   doWin(
     winningInfo.winningArray,
     winningInfo.playerName,
@@ -224,18 +208,32 @@ socket.on("other-player-wins", (winningInfo) => {
     myName,
     handleMouseActions
   );
-  initiateRestart(
-    playerChoices,
-    otherPlayerChoices,
-    socket,
-    myName,
-    gridSquares,
-    numXRows,
-    4,
-    boardColor
-  );
+  playerChoices = [];
+  otherPlayerChoices = [];
+  isWinner.winningArray = [];
+  isWinner.playerWin = false;
+  initiateRestart(socket, myName, gridSquares, boardColor, isWinner);
 });
 
-socket.on("set-turn", (turnInfo) => {
-  console.log(turnInfo);
-});
+function canvasClick() {
+  if (!isMyTurn) return applyHighlightTurn();
+  if (checkIsClicked(currentSquare, playerChoices, otherPlayerChoices) === true)
+    return;
+  playerSelect(
+    currentSquare,
+    playerChoices,
+    ctx,
+    boardColor,
+    canvas.width / numXRows,
+    canvas.width / numYRows
+  );
+  createImage(
+    ctx,
+    playerChoices,
+    canvas.width / numXRows,
+    canvas.height / numYRows,
+    mySymbol[0]
+  );
+  checkWin(playerChoices, isWinner);
+  sendChoiceInfo();
+}

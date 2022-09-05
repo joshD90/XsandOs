@@ -105,3 +105,63 @@ h1 {
 .hidden {
   display: none;
 }
+
+.restartDiv {
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  width: 300px;
+  height: 200px;
+  transform: translate(-50%, -50%);
+  border: solid black;
+  z-index: 10;
+  background-image: url(./assets/blackboardTexture.jpg);
+  box-shadow: 0 0 20px 10px black;
+  border-radius: 10px;
+  background-size: cover;
+  color: white;
+}
+
+.restartButtonDiv {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnRematch {
+  border: none;
+  cursor: pointer;
+  width: 40%;
+  height: 50px;
+  margin: 5px;
+  background-color: #346b31;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  border-radius: 3px;
+}
+
+.btnRematch:hover {
+  background-color: #489244;
+}
+
+.btnDisconnect {
+  border: none;
+  cursor: pointer;
+  width: 40%;
+  height: 50px;
+  margin: 5px;
+  background-color: #cc3010;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  border-radius: 3px;
+}
+
+.btnDisconnect:hover {
+  background-color: #9b240d;
+}
+
+.blurFilter {
+  filter: blur(3px);
+}
