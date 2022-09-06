@@ -1,37 +1,35 @@
-//set up our canvas consts
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
 export const lineWidth = 4;
 
 //use loop to draw x and y grid lines
-function drawGrid(gridSquares, xGrid, yGrid) {
-  console.log("i am being called here drawgrid function");
-
+function drawGrid(boardObject) {
+  const { gridSquares, numXRows, numYRows, canvas, ctx } = boardObject;
+  console.log(numXRows);
   //draw a verticle line from top to bottom of canvas at intervals set by xGrid param
-  for (let i = 0; i < xGrid; i++) {
+  for (let i = 0; i < numXRows; i++) {
+    console.log("xaxis loop");
     ctx.beginPath();
     const middlePoint = gridSquares.find((elem) => elem.coord.x === i);
-    const gridWidth = canvas.width / xGrid;
-    console.log(gridWidth);
+    const gridWidth = canvas.width / numXRows;
+
     const startPointX = middlePoint.center.x + gridWidth / 2 - lineWidth / 2;
 
     ctx.fillStyle = "black";
     ctx.fillRect(startPointX, 0, lineWidth, canvas.height);
   }
   //do the same for the horizontal lines
-  for (let i = 0; i < yGrid; i++) {
+  for (let i = 0; i < numYRows; i++) {
     ctx.beginPath();
     const middlePoint = gridSquares.find((elem) => elem.coord.y === i);
-    const gridHeight = canvas.height / yGrid;
+    const gridHeight = canvas.height / numYRows;
     const startPointY = middlePoint.center.y + gridHeight / 2 - lineWidth / 2;
-
+    ctx.fillStyle = "black";
     ctx.fillRect(0, startPointY, canvas.width, lineWidth);
   }
 }
 
 //giving each square some properties which we can work with in future
-function setGridSquares(gridSquares, numXRows, numYRows) {
+function setGridSquares(boardObject) {
+  const { gridSquares, numXRows, numYRows, canvas } = boardObject;
   const gridWidth = canvas.width / numXRows;
   const gridHeight = canvas.height / numYRows;
   //create a nested for loop, we run down the y values and for each of these
@@ -44,7 +42,7 @@ function setGridSquares(gridSquares, numXRows, numYRows) {
       //3 are in a line, and to check against our mouse pointer
       const center = {
         x: y * gridWidth + gridWidth / 2,
-        y: i * gridWidth + gridHeight / 2,
+        y: i * gridHeight + gridHeight / 2,
       };
       //for each iteration, add the square properties to the gridSquare array
       gridSquares.push({ coord: coord, center: center });
@@ -59,7 +57,7 @@ function drawGridCenter(gridSquares) {
   });
 }
 //this function draws a line between any two points.
-function drawLine(pointA, pointB, color) {
+function drawLine(pointA, pointB, color, ctx) {
   ctx.lineWidth = 6;
   ctx.strokeStyle = color;
   ctx.moveTo(pointA.x, pointA.y);
@@ -67,11 +65,12 @@ function drawLine(pointA, pointB, color) {
   ctx.stroke();
 }
 
-function setUpGrid(gridSquares, xGrid, yGrid) {
+function setUpGrid(boardObject) {
+  const { gridSquares, numXRows, numYRows } = boardObject;
   //fill  the gridSquares properties for each square
-  setGridSquares(gridSquares, xGrid, yGrid);
+  setGridSquares(boardObject);
   //now draw lines based on grid points
-  drawGrid(gridSquares, xGrid, yGrid);
+  drawGrid(boardObject);
 }
 
 export { setUpGrid, drawLine, setGridSquares, drawGrid, drawGridCenter };

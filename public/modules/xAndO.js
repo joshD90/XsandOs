@@ -1,8 +1,17 @@
-const canvas = document.getElementById("canvas");
 //this image goes to the center point of a square and subtracts half the
 //width and height to get to the top left hand corner where it can then draw
 //the image
-export function createImage(ctx, playerSelectArray, width, height, symbol) {
+export function createImage(boardObject, playerSelectArray, symbol) {
+  const { ctx, canvas, numXRows, numYRows } = boardObject;
+
+  let width = canvas.width / numXRows;
+  let height = canvas.height / numYRows;
+
+  if (symbol === "o") {
+    width -= 4;
+    height -= 4;
+  }
+
   playerSelectArray.forEach((elem) => {
     let img = new Image();
     img.src = `/assets/${symbol}Image.png`;
@@ -18,11 +27,8 @@ export function createImage(ctx, playerSelectArray, width, height, symbol) {
   });
 }
 
-export function checkIsClicked(
-  currentSquare,
-  playerChoices,
-  otherPlayerChoices
-) {
+export function checkIsClicked(userObject) {
+  const { currentSquare, playerChoices, otherPlayerChoices } = userObject;
   if (
     playerChoices.some(
       (elem) =>
@@ -46,22 +52,20 @@ export function checkIsClicked(
   return false;
 }
 
-export function playerSelect(
-  currentSquare,
-  playerChoice,
-  ctx,
-  boardColor,
-  width,
-  height
-) {
+export function playerSelect(userObject, boardObject) {
+  const { currentSquare, playerChoices } = userObject;
+  const { canvas, ctx, boardColor, numXRows, numYRows } = boardObject;
+  const width = canvas.width / numXRows;
+  const height = canvas.height / numYRows;
   if (
-    playerChoice.some(
+    playerChoices.some(
       (elem) =>
         elem.center.x === currentSquare.current.center.x &&
         elem.center.y === currentSquare.current.center.y
     )
   )
     return;
+
   ctx.beginPath();
   ctx.fillStyle = boardColor;
   ctx.fillRect(
@@ -70,5 +74,6 @@ export function playerSelect(
     width - 4,
     height - 4
   );
-  playerChoice.push(currentSquare.current);
+
+  playerChoices.push(currentSquare.current);
 }

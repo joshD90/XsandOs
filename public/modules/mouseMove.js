@@ -1,4 +1,3 @@
-const canvas = document.getElementById("canvas");
 export let mouseOnCanvas = false;
 let mousePos = {};
 //only get the mouse position if our mouse is on the board as offset
@@ -21,17 +20,21 @@ export function getMousePosition() {
 
 //Check which square the mouse is over and highlight this, this also
 //updates our current square variable which is fed into the click listener
-export function checkWhichSquare(
-  gridSquares,
-  gsWidth,
-  gsHeight,
-  ctx,
-  currentSquare,
-  playerSquares,
-  otherPlayerSquares,
-  boardColor,
-  boardHighlight
-) {
+export function checkWhichSquare(boardObject, userObject) {
+  //destructure and set our variables
+  const {
+    gridSquares,
+    ctx,
+    boardColor,
+    boardHighlight,
+    canvas,
+    numXRows,
+    numYRows,
+  } = boardObject;
+  const { currentSquare, playerChoices, otherPlayerChoices } = userObject;
+  const gsWidth = canvas.width / (numXRows * 2);
+  const gsHeight = canvas.height / (numYRows * 2);
+
   if (!mouseOnCanvas) return console.log("not on canvas");
   const lineWidth = 4;
   //we iterate through each element of the gridsquares array to see whether the
@@ -52,12 +55,12 @@ export function checkWhichSquare(
         //square already
 
         if (
-          !playerSquares.some(
+          !playerChoices.some(
             (playElem) =>
               playElem.coord.x === elem.coord.x &&
               playElem.coord.y === elem.coord.y
           ) &&
-          !otherPlayerSquares.some(
+          !otherPlayerChoices.some(
             (otherElem) =>
               otherElem.coord.x === elem.coord.x &&
               otherElem.coord.y === elem.coord.y
@@ -77,12 +80,12 @@ export function checkWhichSquare(
         //we return each square to the board color for those squares that
         //arent hovered over in the y access
         if (
-          !playerSquares.some(
+          !playerChoices.some(
             (playElem) =>
               playElem.coord.x === elem.coord.x &&
               playElem.coord.y === elem.coord.y
           ) &&
-          !otherPlayerSquares.some(
+          !otherPlayerChoices.some(
             (otherElem) =>
               otherElem.coord.x === elem.coord.x &&
               otherElem.coord.y === elem.coord.y
@@ -101,12 +104,12 @@ export function checkWhichSquare(
     } else {
       //and we return all the squares to their boardcolor if they fall outside the current square x axis
       if (
-        !playerSquares.some(
+        !playerChoices.some(
           (playElem) =>
             playElem.coord.x === elem.coord.x &&
             playElem.coord.y === elem.coord.y
         ) &&
-        !otherPlayerSquares.some(
+        !otherPlayerChoices.some(
           (otherElem) =>
             otherElem.coord.x === elem.coord.x &&
             otherElem.coord.y === elem.coord.y

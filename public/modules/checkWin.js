@@ -1,7 +1,10 @@
 let count = 0;
 let winningArray = [];
 
-export function checkWin(playerChoices, isWinner) {
+export function checkWin(userObject, boardObject) {
+  const { isWinner, playerChoices } = userObject;
+  const { canvas, numXRows } = boardObject;
+  const squareSize = canvas.width / numXRows;
   //set up our array of directions that we need to cycle through
   const directions = [
     "left",
@@ -16,6 +19,7 @@ export function checkWin(playerChoices, isWinner) {
   //we cycle through each point on the players choice array
 
   playerChoices.forEach((elem) => {
+    console.log("we are running through each player choice");
     if (isWinner.playerWin) return;
     //and go off in every direction from each of those start points
     directions.forEach((directionElem) => {
@@ -24,7 +28,7 @@ export function checkWin(playerChoices, isWinner) {
       winningArray = [{ center: elem.center }];
       //this function checks an adjacent square in the passed direction and continues off in
       //that direction until it returns false or the count increases
-      checkNext(elem, directionElem, playerChoices, 100, isWinner);
+      checkNext(elem, directionElem, playerChoices, squareSize, isWinner);
     });
   });
 }
@@ -37,7 +41,7 @@ function checkNext(
   isWinner
 ) {
   //we check if the count has reach 3 and exit the recursive loop if it has
-  if (count === 3) {
+  if (count === 1) {
     isWinner.playerWin = true;
     isWinner.winningArray = winningArray;
     console.log(isWinner);
@@ -126,6 +130,12 @@ function checkNext(
         x: startPoint.center.x - squareParams,
         y: startPoint.center.y + squareParams,
       };
+      console.log(squareParams, "square params");
+      console.log(
+        playerChoice,
+        nextPoint,
+        "playerChoice and nextPoint in checknext"
+      );
       checkIsInArray(
         playerChoice,
         nextPoint,

@@ -16,24 +16,20 @@ const btnDisconnect = document.querySelector(".btnDisconnect");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-export function initiateRestart(
-  socket,
-  myName,
-  gridSquares,
-  boardColor,
-  isWinner
-) {
+export function initiateRestart(socket, userObject, boardObject) {
   setTimeout(() => {
     restartDiv.classList.remove("hidden");
     document.querySelector(".playBoard").classList.add("blurFilter");
     btnRematch.addEventListener("click", () => {
-      doRematch(socket, myName, gridSquares, boardColor, isWinner);
+      doRematch(socket, boardObject, userObject);
     });
     btnDisconnect.addEventListener("click", disconnect);
   }, 1000);
 }
 
-function doRematch(socket, myName, gridSquares, boardColor, isWinner) {
+function doRematch(socket, boardObject, userObject) {
+  const { myName, isWinner } = userObject;
+  const { gridSquares, boardColor } = boardObject;
   socket.emit("restart-game", { name: myName });
 
   //remove the blur filter from the baord form rematch
@@ -42,7 +38,7 @@ function doRematch(socket, myName, gridSquares, boardColor, isWinner) {
   ctx.fillStyle = boardColor;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   //add in the grid lines
-  drawGrid(gridSquares, 5, 5);
+  drawGrid(boardObject);
   //hide our restart div button
   restartDiv.classList.add("hidden");
   //Change message for the banner

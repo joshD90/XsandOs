@@ -54,17 +54,20 @@ export function getNewPoints(winningArray, firstIndex, secondIndex) {
   return newPoint;
 }
 
-export function doWin(
-  winningArray,
-  whoWins,
-  isMyTurn,
-  canvas,
-  myName,
-  handleMouseActions
-) {
+export function doWin(whoWins, boardObject, handleMouseActions, userObject) {
+  let {
+    isMyTurn,
+    myName,
+    isWinner: { winningArray },
+  } = userObject;
+
+  console.log(winningArray, "winning Array in dowin");
+
+  const { canvas, ctx } = boardObject;
+
   //set up a win message depending on who is the winner
   let bannerMessage;
-
+  console.log(whoWins);
   if (whoWins === myName) {
     bannerMessage = "YOU ARE THE WINNER";
   } else {
@@ -103,6 +106,6 @@ export function doWin(
   //we set our timeout to allow the other listener to cease its activites fully by the time
   //we run this so that the x's and o's dont overwrite our line
   setTimeout(() => {
-    drawLine(beginPoint, endPoint, "white");
+    drawLine(beginPoint, endPoint, "white", ctx);
   }, 200);
 }
