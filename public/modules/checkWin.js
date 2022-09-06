@@ -41,7 +41,7 @@ function checkNext(
   isWinner
 ) {
   //we check if the count has reach 3 and exit the recursive loop if it has
-  if (count === 1) {
+  if (count === 4) {
     isWinner.playerWin = true;
     isWinner.winningArray = winningArray;
     console.log(isWinner);
@@ -192,8 +192,8 @@ function checkIsInArray(
   if (
     playerChoice.find(
       (playerElem) =>
-        playerElem.center.x === nextPoint.center.x &&
-        playerElem.center.y === nextPoint.center.y
+        playerElem.center.x.toFixed(3) === nextPoint.center.x.toFixed(3) &&
+        playerElem.center.y.toFixed(3) === nextPoint.center.y.toFixed(3)
     )
   ) {
     //if part of the array we add to count

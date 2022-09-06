@@ -36,8 +36,8 @@ let playerChoices = [];
 //set up the other players choice array
 let otherPlayerChoices = [];
 //board variables
-const numXRows = 5;
-const numYRows = 5;
+const numXRows = 7;
+const numYRows = 7;
 let boardColor = "#31572f"; //"#346b31";
 const boardHighlight = "#87e082";
 //set up other player name
@@ -64,8 +64,8 @@ let boardObject = {
   canvas: document.getElementById("canvas"),
   ctx: canvas.getContext("2d"),
   gridSquares: [],
-  numXRows: 3,
-  numYRows: 3,
+  numXRows: 7,
+  numYRows: 7,
   boardColor: "#31572f",
   boardHighlight: "#87e082",
 };
