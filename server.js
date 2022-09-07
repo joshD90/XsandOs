@@ -6,6 +6,9 @@ const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const {
+  assignRoomsRefactor,
+} = require("./public/modules/serverModules/assignRoom");
+const {
   assignRooms,
   checkWhichRoom,
   getUserRoom,
@@ -46,7 +49,8 @@ io.on("connection", (socket) => {
   //at a later point
   let newRoomList = [];
   //we assign all users as they connect 2 to a room
-  assignRooms(socket, rooms, newRoomList, users);
+  // assignRooms(socket, rooms, newRoomList, users);
+  assignRoomsRefactor(socket, rooms);
   //send the new user back their id
   io.to(socket.id).emit("my-id", socket.id);
 

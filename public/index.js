@@ -21,7 +21,7 @@ const startButton = document.getElementById("usernameButton");
 const nameInput = document.getElementById("usernameInput");
 const startDiv = document.querySelector(".enterInfo");
 const turnBanner = document.querySelector(".turnBanner");
-//this is the button to enter the name
+//this is the button to enter the user name
 startButton.addEventListener("click", doStart);
 
 //set up our canvas consts
