@@ -64,8 +64,8 @@ let boardObject = {
   canvas: document.getElementById("canvas"),
   ctx: canvas.getContext("2d"),
   gridSquares: [],
-  numXRows: 7,
-  numYRows: 7,
+  numXRows: 4,
+  numYRows: 4,
   boardColor: "#31572f",
   boardHighlight: "#87e082",
 };
