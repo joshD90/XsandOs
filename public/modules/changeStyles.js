@@ -31,6 +31,6 @@ export function applyHighlightTurn() {
   turnBanner.style.fontWeight = "800";
   setTimeout(() => {
     turnBanner.style.color = "black";
-    turnBanner.style.fontWeight = "500";
+    turnBanner.style.fontWeight = "600";
   }, 400);
 }

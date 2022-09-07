@@ -14,6 +14,7 @@ import { playSound } from "./modules/playSound.js";
 import { initiateRestart } from "./modules/restart.js";
 import { drawBoard } from "./modules/drawBoard.js";
 import { isAlreadyTaken } from "./modules/highlightSquare.js";
+import { bannerConnection, bannerTurn } from "./modules/changeBanner.js";
 
 //set up our socket
 const socket = io();
@@ -46,8 +47,8 @@ let boardObject = {
   canvas: document.getElementById("canvas"),
   ctx: canvas.getContext("2d"),
   gridSquares: [],
-  numXRows: 5,
-  numYRows: 5,
+  numXRows: 3,
+  numYRows: 3,
   boardColor: "#31572f",
   boardHighlight: "#87e082",
   boardLine: { width: 4, color: "black" },
@@ -81,27 +82,25 @@ socket.on("set-turn", (info) => {
 
   //add an event listener which will add selection of square to the player choice array
   canvas.addEventListener("click", canvasClick);
-
+  //we can get the other players name by checking all names and seeing whether the id matches out socket id
   userObject.otherPlayerName = info.allPlayers.filter(
     (elem) => elem.socketID !== userObject.myID
   )[0].socketName.name;
-  //we check if the win banner is in place from a previous match and update the banner text
-  const winBanner = document.querySelector(".winBanner");
-  winBanner && winBanner.remove();
 
-  const playerBanner = document.querySelector(".playerConnectionBanner");
-  playerBanner.classList.remove("hidden");
-  playerBanner.innerText = `You have connected with ${userObject.otherPlayerName}`;
   //if our player has been randomly assigned as starter
   if (info.whosTurn.socketID === userObject.myID) {
     //set turn variable and update styles and innertext
     userObject.isMyTurn = true;
     applyIsTurnStyle();
+    //change banner text
+    bannerConnection(userObject);
     //when setting our own symbol we will always take the first element of the symbol array for ourselves and the second
     // element for the opponent, so rather than passing a variable into the set symbol function we simply change the arrangement of the symbol array
     userObject.mySymbol = ["x", "o"];
   } else {
     userObject.isMyTurn = false;
+    //change banner text
+    bannerConnection(userObject);
     applyNotTurn(userObject.otherPlayerName);
     userObject.mySymbol = ["o", "x"];
   }
@@ -122,6 +121,8 @@ const sendChoiceInfo = () => {
   socket.emit("selectionInfo", userObject.playerChoices);
   userObject.isMyTurn = false;
   applyNotTurn(userObject.otherPlayerName);
+  //change banner text
+  bannerConnection(userObject);
 
   if (userObject.isWinner.playerWin) {
     //we emit the event in the case of a win
@@ -157,6 +158,7 @@ socket.on("selectionInfo", (choiceArray) => {
   );
   userObject.isMyTurn = true;
   applyIsTurnStyle();
+  bannerTurn(userObject);
 });
 
 //when we receive the winning notification from the server
