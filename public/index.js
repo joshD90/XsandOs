@@ -26,28 +26,6 @@ startButton.addEventListener("click", doStart);
 
 //set up our canvas consts
 const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-//set up an array to put our grid co-ordinates as well as properties for each square
-let gridSquares = [];
-//set up a variable that updates depending on which square the mouse is hovered over
-let currentSquare = { current: {} };
-//set up array to hold all the squares the player has clicked
-let playerChoices = [];
-//set up the other players choice array
-let otherPlayerChoices = [];
-//board variables
-const numXRows = 7;
-const numYRows = 7;
-let boardColor = "#31572f"; //"#346b31";
-const boardHighlight = "#87e082";
-//set up other player name
-let myName;
-let otherPlayerName;
-let myID;
-let mySymbol;
-//player turn and win conditions
-let isMyTurn;
-let isWinner = { playerWin: false, winningArray: [] };
 
 let userObject = {
   myName: null,
