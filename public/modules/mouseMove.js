@@ -18,112 +18,35 @@ export function getMousePosition() {
   });
 }
 
-//Check which square the mouse is over and highlight this, this also
-//updates our current square variable which is fed into the click listener
-export function checkWhichSquare(boardObject, userObject) {
-  //destructure and set our variables
-  const {
-    gridSquares,
-    ctx,
-    boardColor,
-    boardHighlight,
-    canvas,
-    numXRows,
-    numYRows,
-  } = boardObject;
-  const { currentSquare, playerChoices, otherPlayerChoices } = userObject;
-  const gsWidth = canvas.width / (numXRows * 2);
-  const gsHeight = canvas.height / (numYRows * 2);
-
-  if (!mouseOnCanvas) return console.log("not on canvas");
-  const lineWidth = 4;
-  //we iterate through each element of the gridsquares array to see whether the
-  //mouse position is within its borders
-  gridSquares.forEach((elem) => {
-    if (
-      mousePos.x > elem.center.x - gsWidth &&
-      mousePos.x < elem.center.x + gsWidth
-    ) {
-      if (
-        mousePos.y > elem.center.y - gsHeight &&
-        mousePos.y < elem.center.y + gsHeight
-      ) {
-        currentSquare.current = elem;
-        //now we check to see whether this square we are hovering has already
-        //been selected by our player
-        //and also check to see whether the other player has selected the hovered
-        //square already
-
-        if (
-          !playerChoices.some(
-            (playElem) =>
-              playElem.coord.x === elem.coord.x &&
-              playElem.coord.y === elem.coord.y
-          ) &&
-          !otherPlayerChoices.some(
-            (otherElem) =>
-              otherElem.coord.x === elem.coord.x &&
-              otherElem.coord.y === elem.coord.y
-          )
-        ) {
-          //if not we can highlight the square
-          ctx.beginPath();
-          ctx.fillStyle = boardHighlight;
-          ctx.fillRect(
-            elem.center.x - (gsWidth - lineWidth / 2),
-            elem.center.y - (gsHeight - lineWidth / 2),
-            gsWidth * 2 - lineWidth,
-            gsHeight * 2 - lineWidth
-          );
-        }
-      } else {
-        //we return each square to the board color for those squares that
-        //arent hovered over in the y access
-        if (
-          !playerChoices.some(
-            (playElem) =>
-              playElem.coord.x === elem.coord.x &&
-              playElem.coord.y === elem.coord.y
-          ) &&
-          !otherPlayerChoices.some(
-            (otherElem) =>
-              otherElem.coord.x === elem.coord.x &&
-              otherElem.coord.y === elem.coord.y
-          )
-        ) {
-          ctx.beginPath();
-          ctx.fillStyle = boardColor;
-          ctx.fillRect(
-            elem.center.x - (gsWidth - lineWidth / 2),
-            elem.center.y - (gsHeight - lineWidth / 2),
-            gsWidth * 2 - lineWidth,
-            gsHeight * 2 - lineWidth
-          );
-        }
-      }
-    } else {
-      //and we return all the squares to their boardcolor if they fall outside the current square x axis
-      if (
-        !playerChoices.some(
-          (playElem) =>
-            playElem.coord.x === elem.coord.x &&
-            playElem.coord.y === elem.coord.y
-        ) &&
-        !otherPlayerChoices.some(
-          (otherElem) =>
-            otherElem.coord.x === elem.coord.x &&
-            otherElem.coord.y === elem.coord.y
-        )
-      ) {
-        ctx.beginPath();
-        ctx.fillStyle = boardColor;
-        ctx.fillRect(
-          elem.center.x - (gsWidth - lineWidth / 2),
-          elem.center.y - (gsHeight - lineWidth / 2),
-          gsWidth * 2 - lineWidth,
-          gsHeight * 2 - lineWidth
-        );
-      }
+//update our current square
+export function getCurrentSquare(boardObject, userObject) {
+  //destructure the board object
+  const { gridSquares, canvas, numXRows, numYRows } = boardObject;
+  const { currentSquare } = userObject;
+  //find our square dimensions from boardObject values
+  const squareWidth = canvas.width / numXRows;
+  const squareHeight = canvas.height / numYRows;
+  //iterate through all the board squares and see whether the mouse is inside any square
+  gridSquares.forEach((square) => {
+    if (checkIfInside(mousePos, square, squareWidth, squareHeight)) {
+      //keep track of this square and last square to see if square has changed
+      currentSquare.previous = currentSquare.current;
+      currentSquare.current = square;
     }
   });
+}
+//this function checks whether the x and y value of the mouse pointer falls within
+//a squares range
+export function checkIfInside(mousePosition, gridSquare, width, height) {
+  if (
+    mousePosition.x > gridSquare.center.x - width / 2 &&
+    mousePosition.x < gridSquare.center.x + width / 2
+  ) {
+    if (
+      mousePosition.y > gridSquare.center.y - height / 2 &&
+      mousePosition.y < gridSquare.center.y + height / 2
+    ) {
+      return true;
+    } else return false;
+  } else return false;
 }

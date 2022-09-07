@@ -1,6 +1,6 @@
 import { drawLine, setUpGrid } from "./modules/setUpGrid.js";
-import { getMousePosition, checkWhichSquare } from "./modules/mouseMove.js";
-import { createImage, playerSelect, checkIsClicked } from "./modules/xAndO.js";
+import { getMousePosition, getCurrentSquare } from "./modules/mouseMove.js";
+import { createImage } from "./modules/xAndO.js";
 import { checkWin } from "./modules/checkWin.js";
 import { doWin } from "./modules/winLine.js";
 import {
@@ -12,6 +12,8 @@ import {
 } from "./modules/changeStyles.js";
 import { playSound } from "./modules/playSound.js";
 import { initiateRestart } from "./modules/restart.js";
+import { drawBoard } from "./modules/drawBoard.js";
+import { isAlreadyTaken } from "./modules/highlightSquare.js";
 
 //set up our socket
 const socket = io();
@@ -27,6 +29,7 @@ startButton.addEventListener("click", doStart);
 //set up our canvas consts
 const canvas = document.getElementById("canvas");
 
+//set up our user object so that it can be updated by reference through modular functions
 let userObject = {
   myName: null,
   otherPlayerName: null,
@@ -36,16 +39,19 @@ let userObject = {
   isWinner: { playerWin: false, winningArray: [] },
   playerChoices: [],
   otherPlayerChoices: [],
-  currentSquare: { current: {} },
+  currentSquare: { current: {}, previous: {} },
 };
+//set up our board object so that it can be updated by reference through modular functions
 let boardObject = {
   canvas: document.getElementById("canvas"),
   ctx: canvas.getContext("2d"),
   gridSquares: [],
-  numXRows: 7,
-  numYRows: 7,
+  numXRows: 5,
+  numYRows: 5,
   boardColor: "#31572f",
   boardHighlight: "#87e082",
+  boardLine: { width: 4, color: "black" },
+  winLine: { width: 6, color: "white" },
 };
 
 function doStart(e) {
@@ -103,24 +109,11 @@ socket.on("set-turn", (info) => {
 
 //all board refresh options are fed through the mouse move
 function handleMouseActions() {
-  //check to see if there is a winner and stop drawing if so
-  if (userObject.isWinner.playerWin) return;
-  //set up our event listeners to see whether the mouse is on the canvas
+  getCurrentSquare(boardObject, userObject);
 
-  checkWhichSquare(boardObject, userObject);
-
-  //hope to combine these two functions into one function where we can pass
-  //an o or an x as a param
-  //add all x's
-  createImage(boardObject, userObject.playerChoices, userObject.mySymbol[0]);
-
-  //add other players o's - we minus 4 as the o image looks bad due to touching
-  //the edges of the square
-  createImage(
-    boardObject,
-    userObject.otherPlayerChoices,
-    userObject.mySymbol[1]
-  );
+  if (userObject.currentSquare.current === userObject.currentSquare.previous)
+    return;
+  drawBoard(userObject, boardObject);
 }
 
 //function to send player Info to other player
@@ -186,8 +179,8 @@ socket.on("other-player-wins", (winningInfo) => {
 
 function canvasClick() {
   if (!userObject.isMyTurn) return applyHighlightTurn();
-  if (checkIsClicked(userObject) === true) return;
-  playerSelect(userObject, boardObject);
+  if (isAlreadyTaken(userObject)) return;
+  userObject.playerChoices.push(userObject.currentSquare.current);
   createImage(boardObject, userObject.playerChoices, userObject.mySymbol[0]);
   checkWin(userObject, boardObject);
   sendChoiceInfo();

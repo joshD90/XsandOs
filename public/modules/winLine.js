@@ -63,7 +63,7 @@ export function doWin(whoWins, boardObject, handleMouseActions, userObject) {
 
   console.log(winningArray, "winning Array in dowin");
 
-  const { canvas, ctx } = boardObject;
+  const { canvas, ctx, winLine, boardLine } = boardObject;
 
   //set up a win message depending on who is the winner
   let bannerMessage;
@@ -106,6 +106,6 @@ export function doWin(whoWins, boardObject, handleMouseActions, userObject) {
   //we set our timeout to allow the other listener to cease its activites fully by the time
   //we run this so that the x's and o's dont overwrite our line
   setTimeout(() => {
-    drawLine(beginPoint, endPoint, "white", ctx);
+    drawLine(beginPoint, endPoint, winLine.color, ctx, winLine.width);
   }, 200);
 }
