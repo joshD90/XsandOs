@@ -34,16 +34,29 @@ io.on("connection", (socket) => {
   //send the new user back their id
   io.to(socket.id).emit("my-id", socket.id);
 
-  //set up listener for disconnection
-  socket.on("disconnect", () => {
+  //set up listener for disconnection. If we use disconnecting rather than
+  //disconnection we can still access rooms that socket was part of
+  socket.on("disconnecting", () => {
+    const myRoom = [...socket.rooms][1];
+    console.log(myRoom, "socketondisconnect");
     console.log(`User with id of ${socket.id} has disconnected`);
-
-    socket.broadcast.emit(
-      "user-disconnected",
-      `User with id of ${socket.id} has disconnected`
-    );
+    console.log(socket.data.username);
+    socket.to(myRoom).emit("user-disconnected", socket.data.username);
   });
-  // //set up listener for player sending over their username
+
+  socket.on("switchRooms", () => {
+    const myRoom = [...socket.rooms][1];
+    const numInRoom = rooms.get(myRoom).size;
+    console.log(numInRoom);
+    if (numInRoom < 2) {
+      //leave the room
+      socket.leave(myRoom);
+      assignRoom(socket, rooms);
+      const myNewRoom = [...socket.rooms][1];
+      myNewRoom && setTurn(socket, io, socket.data.username);
+    }
+  });
+  //set up listener for player sending over their username
   socket.on("send-username", (playername) => {
     //once the user has sent over the username, this function will
     //check whether both users are connected and have sent over their

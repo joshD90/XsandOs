@@ -33,19 +33,24 @@ export function bannerTurn(userObject) {
 }
 
 export function bannerWin(userObject, whoWins) {
-  console.log("bannerWin has been called");
   const { myName, otherPlayerName } = userObject;
   turnBanner.classList.add("hidden");
+  connectionBanner.classList.add("hidden");
   //connectionBanner.classList.add("hidden");
   winBanner.classList.remove("hidden");
 
-  winBanner.innerText = "CAN YOU SEE ME NOW BITCHES";
-  //   if (whoWins === myName) winBanner.innerText = "CONGRATS - YOU WON!!";
-  //   else winBanner.innerText = `${otherPlayerName.toUpperCase()} HAS WON`;
+  if (whoWins === myName) winBanner.innerText = "CONGRATS - YOU WON!!";
+  else winBanner.innerText = `${otherPlayerName.toUpperCase()} HAS WON`;
 }
 
-export function bannerRematchWait(document) {
-  const winBanner = document.querySelector(".winBanner");
+export function bannerRematchWait() {
   winBanner.classList.remove("hidden");
   winBanner.innerText = "Waiting on Other Player to Confirm Rematch";
+}
+
+export function bannerDisconnect(playerName) {
+  turnBanner.classList.add("hidden");
+  connectionBanner.classList.add("hidden");
+  winBanner.classList.remove("hidden");
+  winBanner.innerText = `${playerName} has Disconnected - Attempting to Connected with Another Player`;
 }

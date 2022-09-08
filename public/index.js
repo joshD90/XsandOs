@@ -14,7 +14,11 @@ import { playSound } from "./modules/playSound.js";
 import { initiateRestart } from "./modules/restart.js";
 import { drawBoard } from "./modules/drawBoard.js";
 import { isAlreadyTaken } from "./modules/highlightSquare.js";
-import { bannerConnection, bannerTurn } from "./modules/changeBanner.js";
+import {
+  bannerConnection,
+  bannerDisconnect,
+  bannerTurn,
+} from "./modules/changeBanner.js";
 
 //set up our socket
 const socket = io();
@@ -55,11 +59,12 @@ let boardObject = {
   winLine: { width: 6, color: "white" },
 };
 
+//this function covers submitting the players name
 function doStart(e) {
   e.preventDefault();
-
   userObject.myName = nameInput.value;
   socket.emit("send-username", { name: userObject.myName });
+
   startDiv.classList.add("hidden");
 }
 
@@ -67,6 +72,16 @@ function doStart(e) {
 //can use this later
 socket.on("my-id", (id) => {
   userObject.myID = id;
+});
+//if the other player disconnects then we attempt to switch rooms
+socket.on("user-disconnected", (disconnectedName) => {
+  disconnectedName
+    ? bannerDisconnect(disconnectedName.name)
+    : bannerDisconnect("Other Player");
+  setTimeout(() => {
+    console.log("im requesting to switch rooms now");
+    socket.emit("switchRooms");
+  }, 2000);
 });
 
 //call our grid / squares set up
@@ -106,13 +121,50 @@ socket.on("set-turn", (info) => {
   }
 });
 
+//sets up a listener to check for any new input from other user
+socket.on("selectionInfo", (choiceArray) => {
+  userObject.otherPlayerChoices = choiceArray;
+  drawBoard(userObject, boardObject);
+  userObject.isMyTurn = true;
+  applyIsTurnStyle();
+  bannerTurn(userObject);
+});
+
+//when we receive the winning notification from the server
+socket.on("other-player-wins", (winningInfo) => {
+  applyLoseStyle();
+  playSound("lose.wav");
+  //remove the click on canvas listener so board can't be altered
+  canvas.removeEventListener("click", canvasClick);
+
+  userObject.isWinner.winningArray = winningInfo.winningArray;
+
+  doWin(winningInfo.playerName, boardObject, handleMouseActions, userObject);
+
+  initiateRestart(socket, userObject, boardObject);
+});
+
 //all board refresh options are fed through the mouse move
 function handleMouseActions() {
   getCurrentSquare(boardObject, userObject);
-
+  //if our mouse hasn't moved over a different grid square then we dont need to update the board
   if (userObject.currentSquare.current === userObject.currentSquare.previous)
     return;
   drawBoard(userObject, boardObject);
+}
+
+function canvasClick() {
+  //if it's not our turn do nothing except highlight the turnBanner
+  if (!userObject.isMyTurn) return applyHighlightTurn();
+  //if we're clicking on an already marked square leave function
+  if (isAlreadyTaken(userObject)) return;
+  //add the selection to our selection array
+  userObject.playerChoices.push(userObject.currentSquare.current);
+  drawBoard(userObject, boardObject);
+  //check to see whether there is winning combo in this latest selection and emit to server if so
+  checkWin(userObject, boardObject);
+  //else just send over the latest array
+  sendChoiceInfo();
 }
 
 //function to send player Info to other player
@@ -138,52 +190,6 @@ const sendChoiceInfo = () => {
     canvas.removeEventListener("click", canvasClick);
     //carry out win functions
     doWin(userObject.myName, boardObject, handleMouseActions, userObject);
-    userObject.playerChoices = [];
-    userObject.otherPlayerChoices = [];
-    userObject.isWinner.winningArray = [];
-    userObject.isWinner.playerWin = false;
-
     initiateRestart(socket, userObject, boardObject);
   }
 };
-
-//sets up a listener to check for any new input from other user
-socket.on("selectionInfo", (choiceArray) => {
-  userObject.otherPlayerChoices = choiceArray;
-
-  createImage(
-    boardObject,
-    userObject.otherPlayerChoices,
-    userObject.mySymbol[1]
-  );
-  userObject.isMyTurn = true;
-  applyIsTurnStyle();
-  bannerTurn(userObject);
-});
-
-//when we receive the winning notification from the server
-socket.on("other-player-wins", (winningInfo) => {
-  applyLoseStyle();
-  playSound("lose.wav");
-  //remove the click on canvas listener so board can't be altered
-  canvas.removeEventListener("click", canvasClick);
-
-  userObject.isWinner.winningArray = winningInfo.winningArray;
-  console.log(winningInfo.playerName, "socketon otherplayerwin");
-  doWin(winningInfo.playerName, boardObject, handleMouseActions, userObject);
-  userObject.playerChoices = [];
-  userObject.otherPlayerChoices = [];
-  userObject.isWinner.winningArray = [];
-  userObject.isWinner.playerWin = false;
-  console.log(boardObject, "otherPlayerWins Board object");
-  initiateRestart(socket, userObject, boardObject);
-});
-
-function canvasClick() {
-  if (!userObject.isMyTurn) return applyHighlightTurn();
-  if (isAlreadyTaken(userObject)) return;
-  userObject.playerChoices.push(userObject.currentSquare.current);
-  createImage(boardObject, userObject.playerChoices, userObject.mySymbol[0]);
-  checkWin(userObject, boardObject);
-  sendChoiceInfo();
-}
