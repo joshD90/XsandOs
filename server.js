@@ -16,12 +16,13 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
 });
 
+//this will help trace any memory leaks associated with assigning our listeners
+process.on("warning", (e) => {
+  console.log(e.stack);
+});
+
 //set up listener for connection
 io.on("connection", (socket) => {
-  //this will help trace any memory leaks associated with assigning our listeners
-  process.on("warning", (e) => {
-    console.log(e.stack);
-  });
   console.log("a user has connected");
 
   //this searchs for all the room attached to this adapter
