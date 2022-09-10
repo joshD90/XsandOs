@@ -1,4 +1,5 @@
 import { drawLine } from "./setUpGrid.js";
+import { bannerWin } from "./changeBanner.js";
 
 function getSlope(winningArray, firstIndex, secondIndex) {
   //slope = dy / dx
@@ -57,34 +58,15 @@ export function getNewPoints(winningArray, firstIndex, secondIndex) {
 export function doWin(whoWins, boardObject, handleMouseActions, userObject) {
   let {
     isMyTurn,
-    myName,
     isWinner: { winningArray },
   } = userObject;
 
-  console.log(winningArray, "winning Array in dowin");
+  const { canvas, ctx, winLine } = boardObject;
+  //make sure that our canvas stops drawing the x's r o's to let our line go on top
+  canvas.removeEventListener("mousemove", handleMouseActions);
 
-  const { canvas, ctx } = boardObject;
-
-  //set up a win message depending on who is the winner
-  let bannerMessage;
-  console.log(whoWins);
-  if (whoWins === myName) {
-    bannerMessage = "YOU ARE THE WINNER";
-  } else {
-    bannerMessage = `${whoWins} is the Winner`;
-  }
-  //stop player from being able to click
-  isMyTurn = false;
-
-  //we clear the banner area
-  const bannerDiv = document.querySelector(".bannerDiv");
-  document.querySelector(".playerConnectionBanner").classList.add("hidden");
-  document.querySelector(".turnBanner").classList.add("hidden");
-  //now create the new banner, add text and class
-  const winBanner = document.createElement("h1");
-  winBanner.innerText = bannerMessage;
-  winBanner.classList.add("winBanner");
-  bannerDiv.append(winBanner);
+  //change banner text
+  bannerWin(userObject, whoWins);
   //make sure that the player can't take another turn
   isMyTurn = false;
   //draw a line to show the winning element - we will modify the points so that they
@@ -99,13 +81,10 @@ export function doWin(whoWins, boardObject, handleMouseActions, userObject) {
     winningArray.length - 2
   );
 
-  //make sure that our canvas stops drawing the x's r o's to let our line go on top
-  canvas.removeEventListener("mousemove", handleMouseActions);
-  console.log("mousemove event listener removed");
   //draw our line with the adjusted endpoints
   //we set our timeout to allow the other listener to cease its activites fully by the time
   //we run this so that the x's and o's dont overwrite our line
   setTimeout(() => {
-    drawLine(beginPoint, endPoint, "white", ctx);
+    drawLine(beginPoint, endPoint, winLine.color, ctx, winLine.width);
   }, 200);
 }

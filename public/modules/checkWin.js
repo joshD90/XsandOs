@@ -19,7 +19,6 @@ export function checkWin(userObject, boardObject) {
   //we cycle through each point on the players choice array
 
   playerChoices.forEach((elem) => {
-    console.log("we are running through each player choice");
     if (isWinner.playerWin) return;
     //and go off in every direction from each of those start points
     directions.forEach((directionElem) => {
@@ -41,10 +40,11 @@ function checkNext(
   isWinner
 ) {
   //we check if the count has reach 3 and exit the recursive loop if it has
-  if (count === 3) {
+
+  if (count === 2) {
     isWinner.playerWin = true;
     isWinner.winningArray = winningArray;
-    console.log(isWinner);
+
     return;
   }
 
@@ -130,12 +130,7 @@ function checkNext(
         x: startPoint.center.x - squareParams,
         y: startPoint.center.y + squareParams,
       };
-      console.log(squareParams, "square params");
-      console.log(
-        playerChoice,
-        nextPoint,
-        "playerChoice and nextPoint in checknext"
-      );
+
       checkIsInArray(
         playerChoice,
         nextPoint,

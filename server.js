@@ -1,16 +1,11 @@
 //set up express and require everything
-
 const express = require("express");
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const {
-  assignRooms,
-  checkWhichRoom,
-  getUserRoom,
-  setTurn,
-} = require("./public/modules/serverModules/socketFunctions");
+const { assignRoom } = require("./public/modules/serverModules/assignRoom");
+const { setTurn } = require("./public/modules/serverModules/setTurn");
 //link socket.io to sever
 const io = new Server(server);
 //set up static files middleware
@@ -21,45 +16,47 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
 });
 
+//this will help trace any memory leaks associated with assigning our listeners
+process.on("warning", (e) => {
+  console.log(e.stack);
+});
+
 //set up listener for connection
 io.on("connection", (socket) => {
-  //this will help trace any memory leaks associated with assigning our listeners
-  process.on("warning", (e) => {
-    console.log(e.stack);
-  });
   console.log("a user has connected");
-  //set up users
-  let users = [];
-  //run through a loop of sockets and push them into users
-  //unfortunately this will only create a local user array unique to each
-  //socket and only socket id information from other users will be passed over
-  for (let [id, socket] of io.of("/").sockets) {
-    users.push({
-      userID: id,
-      username: socket.username,
-      roomName: null,
-    });
-  }
+
   //this searchs for all the room attached to this adapter
   const rooms = io.of("/").adapter.rooms;
-  //we will push the 'real' rooms onto this array so we can access and use them
-  //at a later point
-  let newRoomList = [];
+
   //we assign all users as they connect 2 to a room
-  assignRooms(socket, rooms, newRoomList, users);
+  assignRoom(socket, rooms);
+
   //send the new user back their id
   io.to(socket.id).emit("my-id", socket.id);
 
-  //set up listener for disconnection
-  socket.on("disconnect", () => {
+  //set up listener for disconnection. If we use disconnecting rather than
+  //disconnection we can still access rooms that socket was part of
+  socket.on("disconnecting", () => {
+    const myRoom = [...socket.rooms][1];
+    console.log(myRoom, "socketondisconnect");
     console.log(`User with id of ${socket.id} has disconnected`);
-    users.filter((user) => user.userID !== socket.id);
-    socket.broadcast.emit(
-      "user-disconnected",
-      `User with id of ${socket.id} has disconnected`
-    );
+    console.log(socket.data.username);
+    socket.to(myRoom).emit("user-disconnected", socket.data.username);
   });
-  // //set up listener for player sending over their username
+
+  socket.on("switchRooms", () => {
+    const myRoom = [...socket.rooms][1];
+    const numInRoom = rooms.get(myRoom).size;
+    console.log(numInRoom);
+    if (numInRoom < 2) {
+      //leave the room
+      socket.leave(myRoom);
+      assignRoom(socket, rooms);
+      const myNewRoom = [...socket.rooms][1];
+      myNewRoom && setTurn(socket, io, socket.data.username);
+    }
+  });
+  //set up listener for player sending over their username
   socket.on("send-username", (playername) => {
     //once the user has sent over the username, this function will
     //check whether both users are connected and have sent over their
@@ -83,7 +80,7 @@ io.on("connection", (socket) => {
 
   //set up listener for the winner
   socket.on("player-wins", (winningInfo) => {
-    const myRoom = getUserRoom(users, socket);
+    const myRoom = [...socket.rooms][1];
     //broadcast the winning playername and the winning array associated
     socket.to(myRoom).emit("other-player-wins", winningInfo);
   });
@@ -95,7 +92,7 @@ io.on("connection", (socket) => {
   });
   //set up listener for change in player selection
   socket.on("selectionInfo", (info) => {
-    const myRoom = getUserRoom(users, socket);
+    const myRoom = [...socket.rooms][1];
     socket.to(myRoom).emit("selectionInfo", info);
   });
 });

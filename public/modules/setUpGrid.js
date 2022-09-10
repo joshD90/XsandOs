@@ -2,19 +2,19 @@ export const lineWidth = 4;
 
 //use loop to draw x and y grid lines
 function drawGrid(boardObject) {
-  const { gridSquares, numXRows, numYRows, canvas, ctx } = boardObject;
-  console.log(numXRows);
+  const { gridSquares, numXRows, numYRows, canvas, ctx, boardLine } =
+    boardObject;
+
   //draw a verticle line from top to bottom of canvas at intervals set by xGrid param
   for (let i = 0; i < numXRows; i++) {
-    console.log("xaxis loop");
     ctx.beginPath();
     const middlePoint = gridSquares.find((elem) => elem.coord.x === i);
     const gridWidth = canvas.width / numXRows;
 
     const startPointX = middlePoint.center.x + gridWidth / 2 - lineWidth / 2;
 
-    ctx.fillStyle = "black";
-    ctx.fillRect(startPointX, 0, lineWidth, canvas.height);
+    ctx.fillStyle = boardLine.color;
+    ctx.fillRect(startPointX, 0, boardLine.width, canvas.height);
   }
   //do the same for the horizontal lines
   for (let i = 0; i < numYRows; i++) {
@@ -22,8 +22,8 @@ function drawGrid(boardObject) {
     const middlePoint = gridSquares.find((elem) => elem.coord.y === i);
     const gridHeight = canvas.height / numYRows;
     const startPointY = middlePoint.center.y + gridHeight / 2 - lineWidth / 2;
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, startPointY, canvas.width, lineWidth);
+    ctx.fillStyle = boardLine.color;
+    ctx.fillRect(0, startPointY, canvas.width, boardLine.width);
   }
 }
 
@@ -57,7 +57,7 @@ function drawGridCenter(gridSquares) {
   });
 }
 //this function draws a line between any two points.
-function drawLine(pointA, pointB, color, ctx) {
+function drawLine(pointA, pointB, color, ctx, lineWidth) {
   ctx.lineWidth = 6;
   ctx.strokeStyle = color;
   ctx.moveTo(pointA.x, pointA.y);

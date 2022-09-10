@@ -1,4 +1,6 @@
 import { drawGrid } from "./setUpGrid.js";
+import { drawBoard } from "./drawBoard.js";
+import { bannerRematchWait } from "./changeBanner.js";
 
 //restart div constants
 
@@ -17,6 +19,13 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 export function initiateRestart(socket, userObject, boardObject) {
+  //dont destructure as they will have to be destructured as variables
+  //and so decouple with the object reference
+  userObject.playerChoices = [];
+  userObject.otherPlayerChoices = [];
+  userObject.isWinner.winningArray = [];
+  userObject.isWinner.playerWin = false;
+
   setTimeout(() => {
     restartDiv.classList.remove("hidden");
     document.querySelector(".playBoard").classList.add("blurFilter");
@@ -35,15 +44,11 @@ function doRematch(socket, boardObject, userObject) {
   //remove the blur filter from the baord form rematch
   document.querySelector(".playBoard").classList.remove("blurFilter");
   //draw over the whole board with background color
-  ctx.fillStyle = boardColor;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  //add in the grid lines
-  drawGrid(boardObject);
+  drawBoard(userObject, boardObject);
   //hide our restart div button
   restartDiv.classList.add("hidden");
-  //Change message for the banner
-  document.querySelector(".winBanner").innerText =
-    "Waiting on Other Player to Confirm Rematch";
+  //change banner
+  bannerRematchWait();
 }
 
 function disconnect() {
