@@ -16,7 +16,8 @@ export function createImage(boardObject, playerSelectArray, symbol) {
   let height = canvas.height / numYRows;
 
   let symbolImg;
-
+  //it does not look good if we have the edges of the "o" image touching
+  //the gridlines so we subtract a small amount from the width and height in this case
   if (symbol === "o") {
     symbolImg = imgO;
     width -= 4;
@@ -24,7 +25,7 @@ export function createImage(boardObject, playerSelectArray, symbol) {
   } else {
     symbolImg = imgX;
   }
-
+  //for every element in a our selection or other players selection we draw the symbol
   playerSelectArray.forEach((elem) => {
     ctx.drawImage(
       symbolImg,

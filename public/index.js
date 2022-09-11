@@ -80,6 +80,7 @@ socket.on("user-disconnected", (disconnectedName) => {
     : bannerDisconnect("Other Player");
   setTimeout(() => {
     console.log("im requesting to switch rooms now");
+
     socket.emit("switchRooms");
   }, 2000);
 });
@@ -89,6 +90,11 @@ setUpGrid(boardObject);
 
 //now we wait until the server detects that both players are detected and have set a name
 socket.on("set-turn", (info) => {
+  //we need to reset these values if there has been any room switches
+  userObject.playerChoices = [];
+  userObject.otherPlayerChoices = [];
+  userObject.isWinner.playerWin = false;
+  drawBoard(userObject, boardObject);
   //get our mousePosition - this sets up a listener which will feed back the mouse
   //position to the modules local variable
   getMousePosition();
@@ -123,9 +129,12 @@ socket.on("set-turn", (info) => {
 
 //sets up a listener to check for any new input from other user
 socket.on("selectionInfo", (choiceArray) => {
+  //we update our user object
   userObject.otherPlayerChoices = choiceArray;
+  //redraw the board to reflect the new changes
   drawBoard(userObject, boardObject);
   userObject.isMyTurn = true;
+  //applies the highlighted style and changes the banner text to reflect whos turn it is
   applyIsTurnStyle();
   bannerTurn(userObject);
 });
@@ -138,9 +147,9 @@ socket.on("other-player-wins", (winningInfo) => {
   canvas.removeEventListener("click", canvasClick);
 
   userObject.isWinner.winningArray = winningInfo.winningArray;
-
+  //carry out win function
   doWin(winningInfo.playerName, boardObject, handleMouseActions, userObject);
-
+  //this will bring up the restart div after a short timeout
   initiateRestart(socket, userObject, boardObject);
 });
 

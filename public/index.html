@@ -8,6 +8,7 @@
     <title>X's and O's</title>
   </head>
   <body>
+    <!-- this contains information about connecting, who's turn it is or win state -->
     <div class="bannerDiv">
       <h1 class="winBanner hidden">This is the win banner look at me now</h1>
       <h2 class="playerConnectionBanner">
@@ -15,11 +16,11 @@
       </h2>
       <h3 class="turnBanner hidden">It's Your Turn</h3>
     </div>
-
+    <!-- this is our board canvas where the game takes place -->
     <div class="playBoard">
       <canvas id="canvas" height="500" width="500"></canvas>
     </div>
-
+    <!-- At the start of the game the player can only view a div that contains a form that provides a username -->
     <div class="enterInfo">
       <div class="enterInfoHeaderDiv">
         <h3>Welcome to X's and O's</h3>
@@ -33,15 +34,15 @@
         </form>
       </div>
     </div>
-
+    <!-- This div will pop up to give the player the chance to restart the game with the player, or to disconnect -->
     <div class="restartDiv hidden">
       <h1 class="restartTitle">Would you like a rematch?</h1>
       <div class="restartButtonDiv">
         <button class="btnRematch">Rematch</button>
-        <button class="btnDisconnect">Disconnect</button>
+        <button class="btnDisconnect">Leave Match</button>
       </div>
     </div>
-
+    <!-- attach any modules that we will be using -->
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="/modules/changeBanner.js"></script>
     <script type="module" src="/modules/restart.js"></script>

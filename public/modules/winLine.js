@@ -6,7 +6,7 @@ function getSlope(winningArray, firstIndex, secondIndex) {
   const slope =
     (winningArray[firstIndex].center.y - winningArray[secondIndex].center.y) /
     (winningArray[firstIndex].center.x - winningArray[secondIndex].center.x);
-  console.log(slope);
+
   //square the slope to ensure it's positive and then find square root to return to original value
   return Math.sqrt(slope * slope);
 }
@@ -73,7 +73,8 @@ export function doWin(whoWins, boardObject, handleMouseActions, userObject) {
   //extend beyond the immediate points
   let beginPoint = { x: null, y: null };
   let endPoint = { x: null, y: null };
-  //create a beginning point and an end point for the line to be drawn
+  //create a beginning point and an end point for the line to be drawn.  These new points
+  //extend past the center point
   beginPoint = getNewPoints(winningArray, 0, 1);
   endPoint = getNewPoints(
     winningArray,

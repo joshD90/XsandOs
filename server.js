@@ -38,16 +38,16 @@ io.on("connection", (socket) => {
   //disconnection we can still access rooms that socket was part of
   socket.on("disconnecting", () => {
     const myRoom = [...socket.rooms][1];
-    console.log(myRoom, "socketondisconnect");
+
     console.log(`User with id of ${socket.id} has disconnected`);
-    console.log(socket.data.username);
+
     socket.to(myRoom).emit("user-disconnected", socket.data.username);
   });
 
   socket.on("switchRooms", () => {
     const myRoom = [...socket.rooms][1];
     const numInRoom = rooms.get(myRoom).size;
-    console.log(numInRoom);
+
     if (numInRoom < 2) {
       //leave the room
       socket.leave(myRoom);
@@ -56,6 +56,7 @@ io.on("connection", (socket) => {
       myNewRoom && setTurn(socket, io, socket.data.username);
     }
   });
+
   //set up listener for player sending over their username
   socket.on("send-username", (playername) => {
     //once the user has sent over the username, this function will

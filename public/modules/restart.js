@@ -7,14 +7,7 @@ import { bannerRematchWait } from "./changeBanner.js";
 const restartDiv = document.querySelector(".restartDiv");
 const btnRematch = document.querySelector(".btnRematch");
 const btnDisconnect = document.querySelector(".btnDisconnect");
-
-//banner element constants
-
-// const bannerDiv = document.querySelector(".displayBanner");
-// const connectionBanner = document.querySelector(".playerConnectionBanner");
-// const turnBanner = document.querySelector(".turnBanner");
-
-//board
+//canvas constants
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -29,10 +22,16 @@ export function initiateRestart(socket, userObject, boardObject) {
   setTimeout(() => {
     restartDiv.classList.remove("hidden");
     document.querySelector(".playBoard").classList.add("blurFilter");
-    btnRematch.addEventListener("click", () => {
-      doRematch(socket, boardObject, userObject);
+    btnRematch.addEventListener(
+      "click",
+      () => {
+        doRematch(socket, boardObject, userObject);
+      },
+      { once: true }
+    );
+    btnDisconnect.addEventListener("click", leaveGame, {
+      once: true,
     });
-    btnDisconnect.addEventListener("click", disconnect);
   }, 1000);
 }
 
@@ -51,6 +50,6 @@ function doRematch(socket, boardObject, userObject) {
   bannerRematchWait();
 }
 
-function disconnect() {
-  console.log("Player wants to disconnect");
+function leaveGame() {
+  window.location.reload();
 }

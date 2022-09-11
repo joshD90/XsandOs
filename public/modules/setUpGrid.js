@@ -12,7 +12,7 @@ function drawGrid(boardObject) {
     const gridWidth = canvas.width / numXRows;
 
     const startPointX = middlePoint.center.x + gridWidth / 2 - lineWidth / 2;
-
+    //draw the line
     ctx.fillStyle = boardLine.color;
     ctx.fillRect(startPointX, 0, boardLine.width, canvas.height);
   }
