@@ -44,6 +44,8 @@ function doRematch(socket, boardObject, userObject) {
   document.querySelector(".playBoard").classList.remove("blurFilter");
   //draw over the whole board with background color
   drawBoard(userObject, boardObject);
+  //reset isDraw back to false
+  userObject.isWinner.isDraw = false;
   //hide our restart div button
   restartDiv.classList.add("hidden");
   //change banner

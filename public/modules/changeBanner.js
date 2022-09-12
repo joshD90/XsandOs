@@ -37,12 +37,20 @@ export function bannerWin(userObject, whoWins) {
   const { myName, otherPlayerName } = userObject;
   turnBanner.classList.add("hidden");
   connectionBanner.classList.add("hidden");
-  //connectionBanner.classList.add("hidden");
   winBanner.classList.remove("hidden");
 
   if (whoWins === myName) winBanner.innerText = "CONGRATS - YOU WON!!";
   else winBanner.innerText = `${otherPlayerName.toUpperCase()} HAS WON`;
 }
+//displayed if there is a draw
+export function bannerDraw() {
+  turnBanner.classList.add("hidden");
+  connectionBanner.classList.add("hidden");
+  winBanner.classList.remove("hidden");
+
+  winBanner.innerText = "THE GAME IS A DRAW";
+}
+
 //this will be displayed when a player clicks rematch but the other player hasnt yet
 export function bannerRematchWait() {
   winBanner.classList.remove("hidden");

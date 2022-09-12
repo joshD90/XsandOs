@@ -17,7 +17,6 @@ async function assignRoom(socket, rooms) {
   } else {
     socket.join(`room${roomToJoin(realRooms)}`);
   }
-  console.log(realRooms, "real rooms at the end");
 }
 //if there are no spare rooms to join, we check to see whether there are any room names that have become
 //available, ie. both users have disconnected from room 1, however there are users in room 2,3,4,5,6.  This will

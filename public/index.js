@@ -3,6 +3,7 @@ import { getMousePosition, getCurrentSquare } from "./modules/mouseMove.js";
 import { createImage } from "./modules/xAndO.js";
 import { checkWin } from "./modules/checkWin.js";
 import { doWin } from "./modules/winLine.js";
+import { checkDraw, doDraw } from "./modules/checkDraw.js";
 import {
   applyIsTurnStyle,
   applyNotTurn,
@@ -41,7 +42,7 @@ let userObject = {
   myID: null,
   mySymbol: null,
   isMyTurn: null,
-  isWinner: { playerWin: false, winningArray: [] },
+  isWinner: { playerWin: false, winningArray: [], isDraw: false },
   playerChoices: [],
   otherPlayerChoices: [],
   currentSquare: { current: {}, previous: {} },
@@ -133,10 +134,13 @@ socket.on("selectionInfo", (choiceArray) => {
   userObject.otherPlayerChoices = choiceArray;
   //redraw the board to reflect the new changes
   drawBoard(userObject, boardObject);
+  if (userObject.isWinner.isDraw)
+    return console.log("should be terminating the selectionInfo due to draw");
   userObject.isMyTurn = true;
   //applies the highlighted style and changes the banner text to reflect whos turn it is
   applyIsTurnStyle();
   bannerTurn(userObject);
+  console.log("no draw and applying new styles");
 });
 
 //when we receive the winning notification from the server
@@ -151,6 +155,11 @@ socket.on("other-player-wins", (winningInfo) => {
   doWin(winningInfo.playerName, boardObject, handleMouseActions, userObject);
   //this will bring up the restart div after a short timeout
   initiateRestart(socket, userObject, boardObject);
+});
+
+socket.on("player-draw", () => {
+  userObject.isWinner.isDraw = true;
+  doDraw(socket, userObject, boardObject, canvasClick);
 });
 
 //all board refresh options are fed through the mouse move
@@ -172,6 +181,9 @@ function canvasClick() {
   drawBoard(userObject, boardObject);
   //check to see whether there is winning combo in this latest selection and emit to server if so
   checkWin(userObject, boardObject);
+  //check to see whether there is a draw or not
+  if (!userObject.isWinner.playerWin)
+    checkDraw(socket, userObject, boardObject);
   //else just send over the latest array
   sendChoiceInfo();
 }

@@ -86,6 +86,12 @@ io.on("connection", (socket) => {
     socket.to(myRoom).emit("other-player-wins", winningInfo);
   });
 
+  socket.on("draw", () => {
+    const myRoom = [...socket.rooms][1];
+    //broadcast to all in room that a draw took place
+    io.in(myRoom).emit("player-draw");
+  });
+
   //set up listener for events named chat message
   socket.on("chat message", (message) => {
     //when we get this we emit to all others connected

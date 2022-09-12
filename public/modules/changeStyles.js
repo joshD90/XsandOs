@@ -21,6 +21,11 @@ export function applyLoseStyle() {
   body.style.backgroundImage = "radial-gradient(white,#cc3010,black)";
   canvas.style.filter = "brightness(1)";
 }
+//on drawing the background will display a grey color
+export function applyDrawStyle() {
+  body.style.backgroundImage = "radial-gradient(white,blue)";
+  canvas.style.filter = "brightness(1)";
+}
 //if the player trys to click on the board when it is not their turn, the turn banner will highlight
 //to show them it is not their turn.
 export function applyHighlightTurn() {
